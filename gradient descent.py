@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """Gradient Descent"""
 
-from grid_search import compute_loss
+from costs import *
 
 def compute_gradient(y, tx, w):
     """Compute the gradient."""
     N = len(y)
-    e = y - tx.dot(w)    
+    e = compute_gradient(y, tx, w)   
     gradient = -1/N * (np.transpose(tx)).dot(e))
     return e, gradient
 
@@ -20,7 +20,7 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma):
     for n_iter in range(max_iters):
         """Compute gradient and loss"""
         e, gradient = compute_gradient(y, tx, w)
-        loss = compute_loss(y, tx, w)
+        loss = compute_mse(y, tx, w)
         w = w - gamma*gradient 
         
         # store w and loss
