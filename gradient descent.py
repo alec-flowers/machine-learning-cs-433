@@ -7,7 +7,7 @@ def compute_gradient(y, tx, w):
     """Compute the gradient."""
     N = len(y)
     e = y - tx.dot(w)    
-    gradient = -1/N * (np.transpose(tx)).dot(e)
+    gradient = -1/N * (np.transpose(tx)).dot(e))
     return e, gradient
 
 
