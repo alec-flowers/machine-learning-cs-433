@@ -1,23 +1,21 @@
 # -*- coding: utf-8 -*-
 """Stochastic Gradient Descent"""
 
+from helpers import batch_iter
+from costs import *
 
-def compute_stoch_gradient(y, tx, w):  #y and tx correspond to the mini-batch
+def compute_stoch_gradient(y, tx, w):
     """Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
-    # implement stochastic gradient computation.It's same as the gradient descent.
     N = len(y)
-    e = y - tx.dot(w)    #error vector
-    g = -1/N * (np.transpose(tx)).dot(e)   #g = stochastic gradient
+    e = y - tx.dot(w)   
+    g = -1/N * (np.transpose(tx)).dot(e)   
     return e, g
 
     
     
 def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
     """Stochastic gradient descent algorithm."""
-    
-    from helpers import batch_iter
-    
-    
+     
     # Define parameters to store w and loss
     ws = [initial_w]
     losses = []
@@ -28,9 +26,8 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
         
             """Compute gradient and loss"""
             e, gradient = compute_stoch_gradient(y_batch, tx_batch, w)
-            loss = compute_loss_MSE(y, tx, w)
-        
-            w = w - gamma*gradient  #w is w(t+1) = w(t) - gamma*gradient(w(t))
+            loss = compute_mse(y, tx, w)
+            w = w - gamma*gradient
         
             # store w and loss
             ws.append(w)
