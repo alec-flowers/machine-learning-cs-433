@@ -12,9 +12,7 @@ def load_data(sub_sample=True, add_outlier=False):
     weight = data[:, 1]
     gender = np.genfromtxt(
         path_dataset, delimiter=",", skip_header=1, usecols=[0],
-        converters={0: lambda x: 0 if b"Male" in x else 1}) #if male it will be 1, and for female it will be 0
-                           #lambda és una cosa que té Python
-                            #és per definir un paràmetre. En aquest cas és x, i diem que serà 0 si és male i serà 1 si no 
+        converters={0: lambda x: 0 if b"Male" in x else 1})
     # Convert to metric system
     height *= 0.025
     weight *= 0.454
@@ -46,8 +44,7 @@ def build_model_data(height, weight):
     y = weight
     x = height
     num_samples = len(y)
-    tx = np.c_[np.ones(num_samples), x]   #una fila per a cada sample. A la primera columna hi tenim 1s i a la segona hi tenim                                             #els weights
-        #np.c_ Translates slice objects to concatenation along the second axis
+    tx = np.c_[np.ones(num_samples), x]
     return y, tx
 
 
