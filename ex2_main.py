@@ -1,26 +1,18 @@
 import datetime
-from costs import *
-from gradient_descent import *
-from helpers import *
-from plots import *
-from proj1_helpers import *
-from stochastic_gradient_descent import *
-from grid_search import *
+import numpy as np
+from gradient_descent import gradient_descent, stochastic_gradient_descent
+from helpers import load_data, standardize, build_model_data
+from plots import grid_visualization
+from grid_search import generate_w, get_best_parameters, grid_search
 
-if __name__ == "__main__": 
-
-    height, weight, gender = load_data(sub_sample=False, add_outlier=False)
-    x, mean_x, std_x = standardize(height)
-    y, tx = build_model_data(x, weight)
-
-    #Grid Search
-    '''
+def run_grid_search(y, tx):
+    print('\n -------- Grid Search ------- \n')
     # Generate the grid of parameters to be swept
     grid_w0, grid_w1 = generate_w(num_intervals=100)
 
     # Start the grid search
     start_time = datetime.datetime.now()
-    grid_losses = grid_search(y, tx, grid_w0, grid_w1)  
+    grid_losses = grid_search(y, tx, grid_w0, grid_w1)
 
     # Select the best combinaison
     loss_star, w0_star, w1_star = get_best_parameters(grid_w0, grid_w1, grid_losses)
@@ -35,11 +27,9 @@ if __name__ == "__main__":
     fig = grid_visualization(grid_losses, grid_w0, grid_w1, mean_x, std_x, height, weight)
     fig.set_size_inches(10.0,6.0)
     fig.savefig("./img/grid_plot")  # Optional saving
-    '''
 
-    #Gradient Descent
-    '''
-    # Define the parameters of the algorithm.
+def run_gd(y, tx):
+    print('\n -------- GD ------- \n')
     max_iters = 50
     gamma = .1
 
@@ -54,11 +44,11 @@ if __name__ == "__main__":
     # Print result
     exection_time = (end_time - start_time).total_seconds()
     print("Gradient Descent: execution time={t:.3f} seconds".format(t=exection_time))
-    '''
 
-    #Stochastic Gradient Descent
-    
+#Stochastic Gradient Descent
+def run_sgd(y, tx):
     # Define the parameters of the algorithm.
+    print('\n -------- SGD ------- \n')
     n_iters = 50
     gamma = 0.3
     batch_size = 1
@@ -75,3 +65,15 @@ if __name__ == "__main__":
     # Print result
     exection_time = (end_time - start_time).total_seconds()
     print("SGD: execution time={t:.3f} seconds".format(t=exection_time))
+
+if __name__ == "__main__": 
+
+    height, weight, gender = load_data(sub_sample=False, add_outlier=False)
+    x, mean_x, std_x = standardize(height)
+    y, tx = build_model_data(x, weight)
+
+    run_grid_search(y, tx)
+    run_gd(y, tx)
+    run_sgd(y, tx)
+
+    #On my cpu SGD runs slower than GD... not sure why exaclty as it shouldn't be the case
