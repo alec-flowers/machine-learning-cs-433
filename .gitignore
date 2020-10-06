@@ -2,3 +2,5 @@
 data/
 # ignore intellij stuff
 .idea/
+
+__pycache__/

@@ -8,7 +8,9 @@ from helpers import batch_iter
 def compute_stoch_gradient(y, tx, w, batch_size):
 	"""Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
 	N = len(y)
+	#This is broken because we aren't iterating over the iterator. I will fix this in a seperate branch.
 	y_batch, tx_batch = batch_iter(y, tx, batch_size=batch_size, num_batches=1)
+
 	e = compute_error(y_batch, tx_batch, w)
 	g = -1 / N * (np.transpose(tx)).dot(e)
 	return e, g
