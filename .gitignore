@@ -3,4 +3,4 @@ data/
 # ignore intellij stuff
 .idea/
 
-__pychache__/
+__pycache__/

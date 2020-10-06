@@ -13,13 +13,14 @@ if __name__ == "__main__":
     x, mean_x, std_x = standardize(height)
     y, tx = build_model_data(x, weight)
 
+    #Grid Search
     '''
     # Generate the grid of parameters to be swept
     grid_w0, grid_w1 = generate_w(num_intervals=100)
 
     # Start the grid search
     start_time = datetime.datetime.now()
-    grid_losses = grid_search(y, tx, grid_w0, grid_w1)
+    grid_losses = grid_search(y, tx, grid_w0, grid_w1)  
 
     # Select the best combinaison
     loss_star, w0_star, w1_star = get_best_parameters(grid_w0, grid_w1, grid_losses)
@@ -35,6 +36,8 @@ if __name__ == "__main__":
     fig.set_size_inches(10.0,6.0)
     fig.savefig("./img/grid_plot")  # Optional saving
     '''
+
+    #Gradient Descent
     '''
     # Define the parameters of the algorithm.
     max_iters = 50
@@ -53,7 +56,9 @@ if __name__ == "__main__":
     print("Gradient Descent: execution time={t:.3f} seconds".format(t=exection_time))
     '''
 
-    # from stochastic_gradient_descent import *
+
+    #Stochastic Gradient Descent
+    
     # Define the parameters of the algorithm.
     n_iters = 100
     gamma = 0.3
