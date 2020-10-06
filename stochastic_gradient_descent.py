@@ -5,15 +5,15 @@ from costs import *
 from helpers import batch_iter
 
 
-def compute_stoch_gradient(y, tx, w, batch_size):
+def compute_stoch_gradient(y, tx, w):
 	"""Compute a stochastic gradient from just few examples n and their corresponding y_n labels."""
-	N = len(y)
-	#This is broken because we aren't iterating over the iterator. I will fix this in a seperate branch.
-	y_batch, tx_batch = batch_iter(y, tx, batch_size=batch_size, num_batches=1)
-
-	e = compute_error(y_batch, tx_batch, w)
-	g = -1 / N * (np.transpose(tx)).dot(e)
-	return e, g
+	y_hat = np.sum(tx * w, axis=1)
+	N = len(tx)
+	e = y - y_hat
+	
+	gradient = (-1/N) * tx.T.dot(e)
+	
+	return gradient
 
 
 def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
@@ -22,13 +22,15 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
 	# Define parameters to store w and loss
 	ws = [initial_w]
 	losses = []
-	w = initial_w
 
 	for n_iter in range(max_iters):
 		"""Compute gradient and loss"""
-		e, gradient = compute_stoch_gradient(y, tx, w, batch_size)
-		w = w - gamma * gradient
-		loss = compute_mse(y, tx, w)
+		loss = compute_mse(y, tx, ws[n_iter])
+
+		for batch_y, batch_tx in batch_iter(y, tx, batch_size):
+			gradient = compute_stoch_gradient(y, tx, ws[n_iter])
+			w = ws[n_iter] - gamma * gradient
+
 		# store w and loss
 		ws.append(w)
 		losses.append(loss)

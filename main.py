@@ -56,11 +56,10 @@ if __name__ == "__main__":
     print("Gradient Descent: execution time={t:.3f} seconds".format(t=exection_time))
     '''
 
-
     #Stochastic Gradient Descent
     
     # Define the parameters of the algorithm.
-    n_iters = 100
+    n_iters = 50
     gamma = 0.3
     batch_size = 1
 
