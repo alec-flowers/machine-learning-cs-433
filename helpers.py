@@ -6,7 +6,7 @@ import numpy as np
 
 def load_data(sub_sample=True, add_outlier=False):
     """Load data and convert it to the metrics system."""
-    path_dataset = "height_weight_genders.csv"
+    path_dataset = "./Data/height_weight_genders.csv"
     data = np.genfromtxt(
         path_dataset, delimiter=",", skip_header=1, usecols=[1, 2])
     height = data[:, 0]
