@@ -2,11 +2,13 @@
 """Functions used to compute the loss."""
 import numpy as np
 
+
 def compute_error(y, tx, w):
 	"""
 	Computes error e.
 	"""
 	return y - tx.dot(w)
+
 
 def compute_mse(y, tx, w):
 	"""Calculate the loss using MSE (Mean Squared Error). """
@@ -14,6 +16,7 @@ def compute_mse(y, tx, w):
 	e = compute_error(y, tx, w)
 	loss = 1 / (2 * N) * np.sum(e ** 2)
 	return loss
+
 
 def compute_mae(y, tx, w):
 	"""Calculate the loss using MAE (Mean Absolute Error)."""
@@ -23,20 +26,23 @@ def compute_mae(y, tx, w):
 	return loss
 
 
-def mse(y, y_hat):
+def mse(e):
 	'Calculates and returns MSE between two vectors of same size'
-    return np.sum((y - y_hat)**2) / (2 * len(y_hat))
-    
-def mae(y, y_hat):
+	return np.sum(e ** 2) / (2 * len(e))
+
+
+def mae(e):
 	'Calculates and returns MAE between two vectors of same size'
-    return np.sum(np.abs(y - y_hat)) / len(y_hat)
+	return np.sum(np.abs(e)) / len(e)
 
-def rmse(y, y_hat):
+
+def rmse(e):
 	'Calculates and returns RMSE between two vectors of same size'
-    return np.sqrt(2*np.sum((y - y_hat)**2) / (2 * len(y_hat)))
+	return np.sqrt(2 * mse(e))
 
-def compute_loss_alec(y, tx, w, error_fn = 'MSE'):
-    """
+
+def compute_loss_alec(y, tx, w, error_fn='MSE'):
+	"""
 	Calculate the loss between dependent variable and prediction.
 
 	Parameters
@@ -59,16 +65,17 @@ def compute_loss_alec(y, tx, w, error_fn = 'MSE'):
 	
 	"""
 
-    y_hat = np.sum(tx * w,axis=1)
-    if error_fn == 'MSE':
-        error = mse(y, y_hat)
-    elif error_fn == 'MAE':
-        error = mae(y, y_hat)
+	e = compute_error(y, tx, w)
+	if error_fn == 'MSE':
+		error = mse(e)
+	elif error_fn == 'MAE':
+		error = mae(e)
 	elif error_fn == 'RMSE':
-		error = rmse(y, y_hat)
-    else:
-        print('Did not match a loss function')
-    return error
+		error = rmse(e)
+	else:
+		raise NotImplementedError('Did not match a loss function')
+	return error
+
 
 def test():
 	y = np.array([2, 3, 4, 3])
