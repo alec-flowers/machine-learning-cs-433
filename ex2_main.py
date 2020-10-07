@@ -62,6 +62,7 @@ if __name__ == "__main__":
     n_iters = 50
     gamma = 0.3
     batch_size = 1
+    num_batches = 1
 
     # Initialization
     w_initial = np.array([0, 0])
@@ -69,7 +70,7 @@ if __name__ == "__main__":
     # Start SGD.
     start_time = datetime.datetime.now()
     sgd_losses, sgd_ws = stochastic_gradient_descent(
-        y, tx, w_initial, batch_size, n_iters, gamma)
+        y, tx, w_initial, batch_size, n_iters, gamma, num_batches)
     end_time = datetime.datetime.now()
 
     # Print result

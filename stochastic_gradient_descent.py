@@ -25,16 +25,14 @@ def compute_stoch_gradient(y, tx, w):
 		gradient of MSE
 	
 	"""
-	y_hat = np.sum(tx * w, axis=1)
 	N = len(tx)
-	e = y - y_hat
-	
+	e = compute_error(y, tx, w)
 	gradient = (-1/N) * tx.T.dot(e)
 
 	return gradient
 
 
-def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
+def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, num_batches):
 	"""Stochastic Gradient Descent algorithm.  
 
 	batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -58,7 +56,10 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
 		number of training epochs
 
 	gamma : float
-		learing rate
+		learning rate
+
+	num_batches: int
+		number of minibatches to use during each iteration
 
 	Returns
 	----------
@@ -78,19 +79,16 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma):
 
 	for n_iter in range(max_iters):
 
-		for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches = 1):
-			'''note if we choose a batch_iter(num_batches > 1) then this will not be
-			updating properly because I use n_iter to index into ws and compute the loss 
-			which does not increase if we loop throug this for loop multiple times. Try putting 2 
-			in num_batches you will see what I am saying.'''
-			gradient = compute_stoch_gradient(batch_y, batch_tx, ws[n_iter])
-			w = ws[n_iter] - gamma * gradient
-		
+		for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
+			'''ws[-1] selects the last element in the list.'''
+			gradient = compute_stoch_gradient(batch_y, batch_tx, ws[-1])
+			w = ws[-1] - gamma * gradient
+			loss = compute_mse(y, tx, w)
+
 			ws.append(w)
-			loss = compute_mse(y, tx, ws[n_iter+1])
 			losses.append(loss)
 			
-			print("Gradient Descent({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(
-				bi=n_iter, ti=max_iters - 1, l=losses[n_iter], w0=w[0], w1=w[1]))
+		print("Gradient Descent({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(
+				bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
 	return losses, ws
