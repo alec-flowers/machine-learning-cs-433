@@ -2,7 +2,7 @@ from time import perf_counter
 
 import numpy as np
 
-from gradient_descent import gradient_descent, stochastic_gradient_descent
+from implementation import gradient_descent, stochastic_gradient_descent
 from grid_search import generate_w, get_best_parameters, grid_search
 from helpers import load_data, standardize, build_model_data
 from plots import grid_visualization
