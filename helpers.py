@@ -31,10 +31,10 @@ def split_data(x, y, ratio, seed=1):
 
 def build_poly(x, degree):
 	"""polynomial basis functions for input data x, for j=0 up to j=degree."""
-	tx_expanded = list()
-	for x_singular in x:
-		tx_expanded.append([x_singular ** i for i in range(0, degree + 1)])
-	return np.array(tx_expanded)
+	tx_expanded = np.zeros((x.shape[0], degree+1))
+    for i in range(degree+1):
+        tx_espanded[:,i] = x**i
+    return tx_expanded
 
 
 def load_data(sub_sample=True, add_outlier=False):
