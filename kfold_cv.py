@@ -79,12 +79,12 @@ def cross_validation(y, x, k_indices, k, hp, model):
         gamma = hp['gamma']
         #train_x = build_poly(train_x, 31) #TODO: FIX
         #test_x = build_poly(test_x, 31)
-        test_y, train_x = build_model_data(train_x, train_y) #todo: fix
+        train_y, train_x = build_model_data(train_x, train_y) #todo: fix
         test_y, test_x = build_model_data(test_x, test_y)
         weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, gamma)
-        loss_te = compute_loss(test_y, test_x, weights, 'RMSE')
+        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
     
-    return loss_tr, loss_te
+    return loss_tr, loss_te, weights
 

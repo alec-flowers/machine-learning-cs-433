@@ -26,7 +26,7 @@ def least_squares(y, tx):
 		
 	"""
 	w = np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
-	loss = compute_loss_alec(y, tx, w, 'RMSE')
+	loss = compute_loss(y, tx, w, 'RMSE')
 	return w, loss
 
 
@@ -58,7 +58,7 @@ def ridge_regression(y, tx, lambda_):
 	D = tx.shape[1]
 
 	w = np.linalg.solve(tx.T.dot(tx) + 2 * N * lambda_ * np.identity(D), tx.T.dot(y))
-	loss = compute_loss_alec(y, tx, w, 'RMSE')
+	loss = compute_loss(y, tx, w, 'RMSE')
 
 	return w, loss
 
@@ -92,7 +92,7 @@ def compute_gradient(y, tx, w):
 	return gradient
 
 
-def gradient_descent(y, tx, initial_w, max_iters, gamma):
+def gradient_descent(y, tx, initial_w, max_iters, gamma, error_type = 'MSE'):
 	"""Gradient Descent algorithm.
 
 	Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -128,18 +128,18 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma):
 
 	W0 = 0
 	ws = [initial_w]
-	losses = [compute_mse(y, tx, ws[W0])]
+	losses = [compute_loss(y, tx, ws[W0], error_type)]
 
 	for n_iter in range(max_iters):
 		gradient = compute_gradient(y, tx, ws[-1])
 		w = ws[-1] - gamma * gradient
-		loss = compute_mse(y, tx, w)
+		loss = compute_loss(y, tx, w, error_type)
 
 		ws.append(w)
 		losses.append(loss)
 
-		print("GD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(
-			bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
+		print("GD({bi}/{ti}): loss={l:.6f}".format(
+			bi=n_iter, ti=max_iters - 1, l=losses[-1]))
 
 	return ws[-1], losses[-1]
 
