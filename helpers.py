@@ -29,7 +29,7 @@ def split_data(x, y, ratio, seed=1):
     y2_test = y2[index_to_split_y:]
     return x2_train, y2_train, x2_test, y2_test
 
-
+# TODO: FIX IT
 def build_poly(x, degree):
     """polynomial basis functions for input data x, for j=0 up to j=degree."""
     tx_expanded = np.zeros((x.shape[0], degree + 1))
@@ -74,10 +74,8 @@ def standardize(x):
     return x, mean_x, std_x
 
 
-def build_model_data(height, weight):
+def build_model_data(x, y):
     """Form (y,tX) to get regression data in matrix form."""
-    y = weight
-    x = height
     num_samples = len(y)
     tx = np.c_[np.ones(num_samples), x]
     return y, tx

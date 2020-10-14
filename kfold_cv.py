@@ -1,4 +1,7 @@
 import numpy as np
+from implementation import ridge_regression, gradient_descent
+from helpers import build_poly, build_model_data
+from costs import compute_loss
 
 
 def product(*args, repeat=1):
@@ -45,10 +48,10 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-def cross_validation(y, x, k_indices, k, lambda_, degree):
+
+def cross_validation(y, x, k_indices, k, hp, model):
     """return the loss of ridge regression."""
     assert k < len(k_indices), 'K is larger than the number of k-folds we create'
-    
     # get k'th subgroup in test, others in train: TODO
     train_i = np.concatenate(np.delete(k_indices, k, axis=0))
     test_i = k_indices[k]
@@ -58,34 +61,30 @@ def cross_validation(y, x, k_indices, k, lambda_, degree):
     test_x = x[(test_i)]
     test_y = y[(test_i)]
 
-    train_x = build_poly(train_x, degree)
-    test_x = build_poly(test_x, degree)
     
-    # ridge regression: TODO
-    weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
-    # calculate the loss for train and test data: TODO
-    loss_te = compute_rmse(test_y, test_x, weights)
+    # ridge regression:
+    if (model == 'ridge'):
+        degree = hp['degrees']  # !!!!!
+        lambda_ = hp['lambda']
+        train_x = build_poly(train_x, degree)  #!!!
+        test_x = build_poly(test_x, degree)
+        weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
+        # calculate the loss for train and test data:
+        loss_te = compute_loss(test_y, test_x, weights, 'RMSE')
+
+    # gradient descent:
+    if (model == 'gd'):
+        initial_w = hp['initial_w']
+        max_iters = hp['max_iters']
+        gamma = hp['gamma']
+        #train_x = build_poly(train_x, 31) #TODO: FIX
+        #test_x = build_poly(test_x, 31)
+        test_y, train_x = build_model_data(train_x, train_y) #todo: fix
+        test_y, test_x = build_model_data(test_x, test_y)
+        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, gamma)
+        loss_te = compute_loss(test_y, test_x, weights, 'RMSE')
+
+    # least squares:
     
     return loss_tr, loss_te
 
-def kfold_cross_validation(y, x, parameters, k_fold):
-    seed = 1
-    grid_search = ParameterGrid(parameters)
-    k_indices = build_k_indices(y, k_fold, seed)
-
-    rmse_tr = []
-    rmse_te = []
-    
-    for p in grid_search:
-        temp_tr = []
-        temp_te = []
-        for k in range(k_fold):
-            loss_tr, loss_te = cross_validation(y, x, k_indices, k, p['lambda'], p['degree'])
-            temp_tr.append(loss_tr)
-            temp_te.append(loss_te)
-        var_tr.append(np.var(temp_tr))    
-        var_te.append(np.var(temp_te))
-        rmse_tr.append(sum(temp_tr)/k_fold)
-        rmse_te.append(sum(temp_te)/k_fold)
-
-    return list(grid_search)[rmse_te.index(min(rmse_te))]
