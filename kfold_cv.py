@@ -2,7 +2,7 @@ from timeit import default_timer as timer
 
 import numpy as np
 from implementation import ridge_regression, gradient_descent
-from helpers import build_poly, build_model_data
+from helpers import build_model_data
 from costs import compute_loss
 
 
@@ -66,14 +66,7 @@ def cross_validation(y, x, k_indices, k, hp, model):
     
     # ridge regression:
     if (model == 'ridge'):
-        degree = hp['degrees']
         lambda_ = hp['lambda']
-
-        start = timer()
-        train_x, ind = build_poly(train_x, degree) 
-        test_x, ind_ = build_poly(test_x, degree)
-        end = timer()
-        print(f'Poly Time: {end-start:.3f}')
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
         # calculate the loss for train and test data:

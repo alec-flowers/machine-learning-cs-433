@@ -57,14 +57,19 @@ def build_poly(x, degree):
         return np.c_[np.ones(row), x], [[str(i+1)] for i in range(col)]
     if degree >= 2:
         poly, ind = build_poly(x, degree-1)
+        set_ind = set(tuple(i) for i in ind)
+
         p_col = poly.shape[1]
         for i in range(col):
             for j in range(1,p_col):
-                mult = np.array(x[:,i]*poly[:,j]).T
                 temp = sorted(ind[i] + ind[j-1])
-                if(temp not in ind):
+                set_temp = tuple(temp)
+
+                if(set_temp not in set_ind):
+                    mult = np.matmul(x[:,i],poly[:,j])
                     poly = np.c_[poly, mult]
                     ind.append(temp)
+                    set_ind.add(set_temp)
         return poly, ind
 
 
