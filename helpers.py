@@ -66,7 +66,7 @@ def build_poly(x, degree):
                 set_temp = tuple(temp)
 
                 if(set_temp not in set_ind):
-                    mult = np.matmul(x[:,i],poly[:,j])
+                    mult = x[:,i]*poly[:,j]
                     poly = np.c_[poly, mult]
                     ind.append(temp)
                     set_ind.add(set_temp)

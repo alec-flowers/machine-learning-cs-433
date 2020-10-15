@@ -60,18 +60,17 @@ if __name__ == "__main__":
     TRAIN_DATASET = DATA_FOLDER + "train.csv"
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample = False)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample = True)
     end = timer()
     print(f'Data Loaded - Time: {end-start:.3f}\n')
 
     #Ridge Regression
     model = 'ridge'
     hyperparameters = {'degrees':[1, 2],
-                        'lambda':np.logspace(-4, 0, 2)}
+                        'lambda':np.logspace(-4, 0, 15)}
 
     hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     print(f'Best Parameters - loss*: {loss_star:.5f}, hp*: {hp_star}')  #, weights: {weights}')
-
 
     # Gradient Descent
     # model = 'gd'
@@ -82,4 +81,4 @@ if __name__ == "__main__":
     # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
     # print('loss*: {}, hp*: {}, weights: {}'.format(loss_star, hp_star, weights))
 
-    #write_json('ridge_bp.json', hp_star)
+    # write_json('ridge_bp.json', hp_star)
