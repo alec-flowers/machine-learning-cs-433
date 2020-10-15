@@ -1,3 +1,5 @@
+from timeit import default_timer as timer
+
 import numpy as np
 from implementation import ridge_regression, gradient_descent
 from helpers import build_poly, build_model_data
@@ -64,23 +66,28 @@ def cross_validation(y, x, k_indices, k, hp, model):
     
     # ridge regression:
     if (model == 'ridge'):
-        degree = hp['degrees']  # !!!!!
+        degree = hp['degrees']
         lambda_ = hp['lambda']
-        train_x = build_poly(train_x, degree)  #!!!
-        test_x = build_poly(test_x, degree)
+
+        start = timer()
+        train_x, ind = build_poly(train_x, degree) 
+        test_x, ind_ = build_poly(test_x, degree)
+        end = timer()
+        print(f'Poly Time: {end-start:.3f}')
+
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
         # calculate the loss for train and test data:
-        loss_te = compute_loss(test_y, test_x, weights, 'RMSE')
+        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # gradient descent:
     if (model == 'gd'):
         initial_w = hp['initial_w']
         max_iters = hp['max_iters']
         gamma = hp['gamma']
-        #train_x = build_poly(train_x, 31) #TODO: FIX
-        #test_x = build_poly(test_x, 31)
+
         train_y, train_x = build_model_data(train_x, train_y) #todo: fix
         test_y, test_x = build_model_data(test_x, test_y)
+
         weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, gamma)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
