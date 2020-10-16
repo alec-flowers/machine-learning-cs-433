@@ -8,18 +8,24 @@ from helpers import write_json, build_poly
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
-    hyperparam = ParameterGrid(hyperparameters)  ###Alec's function!!! D'aquí fa una combinació dels hiperparàmetres
+
+
+    hyperparam = ParameterGrid(hyperparameters)  ### Alec's function!!! D'aquí fa una combinació dels hiperparàmetres
     loss = []
     weights = []
     poly_dict = {}
 
+    # Loop over different combinations of hyperparameters to find the best one
     for hp in hyperparam:
         k_indices = build_k_indices(y, k_fold, seed) #!!
         loss_list = []
 
+        # Making polynomial if asked
         if 'degrees' in hyperparameters.keys():
+            # Checks if the polynomial has already been calculated
             if hp['degrees'] in poly_dict:
                 px = poly_dict[hp['degrees']]
+            # Calculates the polynomial and saves it in a dictionary
             else:
                 start = timer()
                 px, ind = build_poly(x, hp['degrees'])
@@ -29,6 +35,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         else:
             px = x
 
+        # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
             loss_tr, loss_te, weight = cross_validation(y, px, k_indices, k, hp, model)
@@ -64,22 +71,21 @@ if __name__ == "__main__":
     end = timer()
     print(f'Data Loaded - Time: {end-start:.3f}\n')
 
-    #Ridge Regression
-    model = 'ridge'
-    hyperparameters = {'degrees':[1, 2],
-                        'lambda':np.logspace(-4, 0, 2)}
+    #Ridge Regression test
+    #model = 'ridge'
+    #hyperparameters = {'degrees':[1, 2], 'lambda':np.logspace(-4, 0, 2)}
 
-    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    print(f'Best Parameters - loss*: {loss_star:.5f}, hp*: {hp_star}')  #, weights: {weights}')
+    #hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    #print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star}')  #, weights: {weights}')
 
 
-    # Gradient Descent
-    # model = 'gd'
-    # hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
-    #                     'max_iters':[500], 
-    #                     'gamma':[.00000001]}
-
-    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    # print('loss*: {}, hp*: {}, weights: {}'.format(loss_star, hp_star, weights))
+    # Gradient Descent test
+    model = 'gd'
+    hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
+                         'max_iters':[500],
+                         'gamma':[.00000001]}
+    # todo: fix prints
+    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
+    print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
     #write_json('ridge_bp.json', hp_star)

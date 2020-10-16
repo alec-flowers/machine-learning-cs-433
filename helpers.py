@@ -65,9 +65,10 @@ def build_poly(x, degree):
                 temp = sorted(ind[i] + ind[j-1])
                 set_temp = tuple(temp)
 
+                # To not duplicate data:
                 if(set_temp not in set_ind):
-                    mult = np.matmul(x[:,i],poly[:,j])
-                    poly = np.c_[poly, mult]
+                    mult = x[:,i] * poly[:,j]
+                    poly = np.c_[poly, mult]  #!ERROR
                     ind.append(temp)
                     set_ind.add(set_temp)
         return poly, ind
