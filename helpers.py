@@ -67,8 +67,13 @@ def build_poly(x, degree):
 
                 # To not duplicate data:
                 if(set_temp not in set_ind):
+<<<<<<< HEAD
                     mult = x[:,i] * poly[:,j]
                     poly = np.c_[poly, mult]  #!ERROR
+=======
+                    mult = x[:,i]*poly[:,j]
+                    poly = np.c_[poly, mult]
+>>>>>>> ed80c1ca251a97bc247fbce80f3abbc34da9e602
                     ind.append(temp)
                     set_ind.add(set_temp)
         return poly, ind
