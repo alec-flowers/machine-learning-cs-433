@@ -29,6 +29,7 @@ def split_data(x, y, ratio, seed=1):
     y2_test = y2[index_to_split_y:]
     return x2_train, y2_train, x2_test, y2_test
 
+
 def build_poly(x, degree):
     """Polynomial basis functions for multivariate inputs
     Parameters
@@ -54,31 +55,21 @@ def build_poly(x, degree):
     row = x.shape[0]
     col = x.shape[1]
     if degree == 1:
-        return np.c_[np.ones(row), x], [[str(i+1)] for i in range(col)]
+        return np.c_[np.ones(row), x], [[str(i + 1)] for i in range(col)]
     if degree >= 2:
-        poly, ind = build_poly(x, degree-1)
+        poly, ind = build_poly(x, degree - 1)
         set_ind = set(tuple(i) for i in ind)
 
         p_col = poly.shape[1]
         for i in range(col):
-            for j in range(1,p_col):
-                temp = sorted(ind[i] + ind[j-1])
+            for j in range(1, p_col):
+                temp = sorted(ind[i] + ind[j - 1])
                 set_temp = tuple(temp)
 
                 # To not duplicate data:
-                if(set_temp not in set_ind):
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    mult = x[:,i] * poly[:,j]
-                    poly = np.c_[poly, mult]  #!ERROR
-=======
-                    mult = x[:,i]*poly[:,j]
-                    poly = np.c_[poly, mult]
->>>>>>> ed80c1ca251a97bc247fbce80f3abbc34da9e602
-=======
-                    mult = x[:,i] * poly[:,j]
-                    poly = np.c_[poly, mult]  #!ERROR
->>>>>>> 497ac44bf87202f78e336543567a74e77bc936d8
+                if (set_temp not in set_ind):
+                    mult = x[:, i] * poly[:, j]
+                    poly = np.c_[poly, mult]  # !ERROR
                     ind.append(temp)
                     set_ind.add(set_temp)
         return poly, ind

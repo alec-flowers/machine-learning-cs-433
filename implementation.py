@@ -80,8 +80,7 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, error_type='MSE'):
         ws.append(w)
         losses.append(loss)
 
-        print("GD({bi}/{ti}): loss={l:.6f}".format(
-            bi=n_iter, ti=max_iters - 1, l=losses[-1]))
+        #print("GD({bi}/{ti}): loss={l:.6f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1]))
 
     return ws[-1], losses[-1]
 
@@ -104,7 +103,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
         Weight vector
 
     batch_size : int
-        size of
+        size of  the batches
 
     max_iters : int
         number of training epochs
@@ -145,8 +144,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
             ws.append(w)
             losses.append(loss)
 
-            print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(
-                bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
+            #print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
     return ws[-1], losses[-1]
 
@@ -193,7 +191,7 @@ def ridge_regression(y, tx, lambda_):
     tx : ndarray of shape (n_samples, n_features)
         Training data
 
-    lambda : float [0, 1]
+    lambda_ : float [0, 1]
         parsimony penalty
 
     Returns
@@ -215,8 +213,63 @@ def ridge_regression(y, tx, lambda_):
     return w, loss
 
 
+"""Logistic regression"""
+def sigmoid(t):
+    """apply the sigmoid function on t."""
+    sigmoid = 1 / (1 + np.exp(-t))
+    return sigmoid
 
-# Logistic regression (using GD or SGD): TODO
+def calculate_logistic_loss(y, tx, w):
+    """compute the loss: negative log likelihood."""
+    log = np.sum(np.log(1 + np.exp(tx @ w)))
+    minus = - np.sum(y * tx @ w)
+    loss = minus + log
+    return loss
+
+def calculate_gradient_logistic(y, tx, w):
+    """compute the gradient of loss."""
+    gradient = tx.T @ (sigmoid(tx @ w) - y)
+    return gradient
+
+
+def learning_by_gradient_descent(y, tx, w, gamma):
+    """
+    Do one step of gradient descent using logistic regression.
+    Return the loss and the updated w.
+    """
+    loss = calculate_logistic_loss(y, tx, w)
+    gradient = calculate_gradient_logistic(y, tx, w)
+    w = w - gamma * gradient
+    return loss, w
+
+def learning_by_subgradient_descent(y, tx, w, gamma):
+    #TODO: do it, (it's just a copy of gradient descent now) and check logistic regression
+    """
+    Do one step of subgradient descent using logistic regression.
+    Return the loss and the updated w.
+    """
+    loss = calculate_logistic_loss(y, tx, w)
+    gradient = calculate_gradient_logistic(y, tx, w)
+    w = w - gamma * gradient
+    return loss, w
+
+def logistic_regression(y, tx, max_iter, threshold, gamma, loss_minimization='gd'):
+    # Logistic regression (using GD or SGD):
+    losses = []
+    for iter in range(max_iter):
+        if (loss_minimization=='gd'):
+            loss, w = learning_by_gradient_descent(y, tx, w, gamma)
+        elif (loss_minimization == 'sgd'):
+            loss, w = learning_by_subgradient_descent(y, tx, w, gamma, )
+
+        if iter % 100 == 0:
+            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+        # converge criterion
+        losses.append(loss)
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
+    print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+
 
 
 # Regularized logistic regression (using GD or SGD): TODO
