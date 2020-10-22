@@ -12,15 +12,16 @@ def product(*args, repeat=1):
     pools = [tuple(pool) for pool in args] * repeat
     result = [[]]
     for pool in pools:
-        result = [x+[y] for x in result for y in pool]
+        result = [x + [y] for x in result for y in pool]
     for prod in result:
         yield tuple(prod)
+
 
 class ParameterGrid():
     def __init__(self, grid):
         grid = [grid]
         self.grid = grid
-        
+
     def __iter__(self):
         """Iterate over the points in the grid.
         Returns
@@ -58,7 +59,7 @@ def cross_validation(y, x, k_indices, k, hp, model):
     # get k'th subgroup in test, others in train: TODO
     train_i = np.concatenate(np.delete(k_indices, k, axis=0))
     test_i = k_indices[k]
-    
+
     train_x = x[(train_i)]
     train_y = y[(train_i)]
     test_x = x[(test_i)]
@@ -67,28 +68,29 @@ def cross_validation(y, x, k_indices, k, hp, model):
     # Calculation of losses using the specified model
     # gradient descent:
     if (model == 'gd'):
-        initial_w = hp['initial_w']
-        max_iters = hp['max_iters']
-        gamma = hp['gamma']
-
-        train_y, train_x = build_model_data(train_x, train_y) #todo: fix
-        test_y, test_x = build_model_data(test_x, test_y)
-
-        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, gamma)
-        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
-
-    # stochastic gradient descent:
-    if (model == 'sgd'):
-        initial_w = hp['initial_w']
-        batch_size = hp['batch_size']
-        num_batches = hp['num_batches']
-        max_iters = hp['max_iters']
+        initial_w = [0 for _ in range(x.shape[1] + 1)]
+        epsilon = hp['epsilon']
         gamma = hp['gamma']
 
         train_y, train_x = build_model_data(train_x, train_y)  # todo: fix
         test_y, test_x = build_model_data(test_x, test_y)
 
-        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, batch_size, max_iters, gamma, num_batches)
+        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, epsilon, gamma)
+        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
+
+    # stochastic gradient descent:
+    if (model == 'sgd'):
+        initial_w = [0 for _ in range(x.shape[1] + 1)]
+        batch_size = hp['batch_size']
+        num_batches = hp['num_batches']
+        epsilon = hp['epsilon']
+        gamma = hp['gamma']
+
+        train_y, train_x = build_model_data(train_x, train_y)  # todo: fix
+        test_y, test_x = build_model_data(test_x, test_y)
+
+        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, batch_size, epsilon, gamma,
+                                                       num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
@@ -98,7 +100,7 @@ def cross_validation(y, x, k_indices, k, hp, model):
 
     # ridge regression:
     if (model == 'ridge'):
-        lambda_ = hp['lambda'] #todo: degree
+        lambda_ = hp['lambda']  # todo: degree
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
         # calculate the loss for train and test data:
@@ -112,6 +114,4 @@ def cross_validation(y, x, k_indices, k, hp, model):
     if (model == 'regularized_logistic'):
         raise NotImplementedError
 
-    
     return loss_tr, loss_te, weights
-
