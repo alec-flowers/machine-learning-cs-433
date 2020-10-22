@@ -2,10 +2,21 @@ from timeit import default_timer as timer
 
 import numpy as np
 import argparse
+from os import path
 
 from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices
 from helpers import write_json, build_poly, read_json
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
+    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
+                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
+
+    args = parser.parse_args()
+
+    return args
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
@@ -53,12 +64,12 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
             # Calculates the polynomial and saves it in a dictionary
             else:
                 start = timer()
-                px, ind = build_poly(x, hp['degrees'])
+                px, _ = build_poly(x, hp['degrees'])
                 poly_dict[hp['degrees']] = px
                 end = timer()
                 print(f'Poly Time: {end - start:.3f}')
         else:
-            px = x
+            raise KeyError('Hyperparameter should have at least degree=1')
 
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
@@ -75,7 +86,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     hp_star = list(hyperparam)[loss.index(loss_star)]  # this is the hyperparameter that corresponds to the best loss*
     w = weights[loss.index(loss_star)]
 
-    return (hp_star, loss_star, w)
+    return hp_star, loss_star, w
 
 
 def save_hyperparams(model, hp_star):
@@ -84,33 +95,32 @@ def save_hyperparams(model, hp_star):
     write_json(filename, hp_star)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
-    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
-                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
-
-    args = parser.parse_args()
-
-    return args
+def find_hyperparams(model):
+    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
+    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    save_hyperparams(model, hp_star)
 
 
-if __name__ == "__main__":
-    #args = parse_args()
-    #model = args.method
-    model = "gd"
+def read_hyperparam_input(model):
+    # model = "gd"
 
     DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = DATA_FOLDER + "train.csv"
+    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     start = timer()
     y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
-    hyperparameters = read_json(HYPERPARAMS_FOLDER + HYPERPARAMS_INIT_VALUES)[model]
+    hyperparameters = read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
     end = timer()
     print(f'Data Loaded - Time: {end - start:.3f}\n')
 
-    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    return y, x, ids_train, hyperparameters
+
+
+if __name__ == "__main__":
+    args = parse_args()
+    find_hyperparams(args.method)
 
     ## Ridge Regression test
     # model = 'ridge'
@@ -141,5 +151,3 @@ if __name__ == "__main__":
     # hyperparameters = {'degrees': range(1, 3)}  #!!! This one has no hyperparameters, so maybe we should print it differently
     # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
     # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
-
-    save_hyperparams(model, hp_star)
