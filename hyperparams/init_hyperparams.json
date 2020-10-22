@@ -22,7 +22,11 @@
       0.000001
     ],
     "gamma": [
-      0.00000001
+      0.00000000000001
+    ],
+    "degrees": [
+      1,
+      2
     ]
   },
   "least_squares": {
@@ -57,6 +61,50 @@
       0.85,
       0.9,
       0.95
+    ]
+  },
+  "logistic": {
+    "max_iters": [
+      100
+    ],
+    "threshold": [
+      100
+    ],
+    "gamma": [
+      0.00000000000001
+    ],
+    "batch_size": [
+      2
+    ],
+    "num_batches": [
+      2,
+      6
+    ],
+    "degrees": [
+      1,
+      2
+    ]
+  },
+  "regularized_logistic": {
+    "max_iters": [
+      100
+    ],
+    "gamma": [
+      0.00000000000001
+    ],
+    "num_batches": [
+      2,
+      6
+    ],
+    "batch_size": [
+      2
+    ],
+    "degrees": [
+      1,
+      2
+    ],
+    "lambda_": [
+      0.1
     ]
   }
 }

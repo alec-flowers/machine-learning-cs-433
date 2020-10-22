@@ -1,7 +1,8 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
+    logistic_regression, regularized_logistic_regression
 from costs import compute_loss
 
 
@@ -102,15 +103,35 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         lambda_ = hp['lambda']
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
-        # calculate the loss for train and test data:
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # logistic regression: TODO
     elif model == 'logistic':
-        raise NotImplementedError
+        initial_w = [0 for _ in range(x.shape[1])]
+        max_iters = hp['max_iters']
+        threshold = hp['threshold']
+        gamma = hp['gamma']
+        num_batches = hp['num_batches']
+        batch_size = hp['batch_size']
+
+        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
+                                               num_batches)
+        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
-        raise NotImplementedError
+        initial_w = [0 for _ in range(x.shape[1])]
+        max_iters = hp['max_iters']
+        threshold = hp['threshold']
+        gamma = hp['gamma']
+        lambda_ = hp['lambda_']
+        num_batches = hp['num_batches']
+        batch_size = hp['batch_size']
+
+        weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
+                                                           lambda_, batch_size,
+                                                           num_batches)
+        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
+
 
     return loss_tr, loss_te, weights

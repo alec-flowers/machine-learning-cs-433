@@ -76,6 +76,23 @@ def compute_loss(y, tx, w, error_fn='MSE'):
 		raise NotImplementedError('Did not match a loss function')
 	return error
 
+def sigmoid(t):
+    """apply the sigmoid function on t."""
+    sigmoid = 1 / (1 + np.exp(-t))
+    return sigmoid
+
+def calculate_logistic_loss(y, tx, w):
+	"""compute the loss: negative log likelihood."""
+	pred = sigmoid(tx @ w)
+	loss1 = y.T.dot(np.log(pred))
+	loss2 = (1-y).T.dot(np.log(1-pred))
+	loss = loss1 + loss2
+	return np.squeeze(-loss)
+    #### JANET:
+    #log = np.sum(np.log(1 + np.exp(tx @ w)))
+    #minus = - np.sum(y * (tx @ w))
+    #loss = minus + log
+    #return loss
 
 def test():
 	y = np.array([2, 3, 4, 3])

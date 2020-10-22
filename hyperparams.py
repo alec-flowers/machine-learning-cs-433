@@ -12,7 +12,7 @@ from helpers import write_json, build_poly, read_json
 def parse_args():
     parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
     parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
-                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
+                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
 
     args = parser.parse_args()
 
