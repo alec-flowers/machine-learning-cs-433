@@ -1,10 +1,11 @@
 from timeit import default_timer as timer
 
 import numpy as np
+import argparse
 
 from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices
-from helpers import write_json, build_poly
+from helpers import write_json, build_poly, read_json
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
@@ -83,14 +84,33 @@ def save_hyperparams(model, hp_star):
     write_json(filename, hp_star)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
+    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
+                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
+
+    args = parser.parse_args()
+
+    return args
+
+
 if __name__ == "__main__":
+    #args = parse_args()
+    #model = args.method
+    model = "gd"
+
     DATA_FOLDER = 'Data/'
     TRAIN_DATASET = DATA_FOLDER + "train.csv"
+    HYPERPARAMS_FOLDER = 'hyperparams/'
+    HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     start = timer()
     y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    hyperparameters = read_json(HYPERPARAMS_FOLDER + HYPERPARAMS_INIT_VALUES)[model]
     end = timer()
     print(f'Data Loaded - Time: {end - start:.3f}\n')
+
+    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
 
     ## Ridge Regression test
     # model = 'ridge'
@@ -101,20 +121,20 @@ if __name__ == "__main__":
     ### Gradient Descent test
     # model = 'gd'
     # hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
-    #                     'max_iters':[500],
+    #                     'epsilon':[1e-3],
     #                     'gamma':[.00000001]}
     # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
     # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
     ### Stochastic Gradient Descent test
-    model = 'sgd'
-    hyperparameters = {'initial_w': [[0 for _ in range(x.shape[1] + 1)]],
-                      'max_iters': [500],
-                      'gamma': [.00000001],
-                      'num_batches': [2,6],
-                      'batch_size': [2]}
-    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
+    # model = 'sgd'
+    # hyperparameters2 = {'epsilon': [1e-3],
+    #                    'gamma': [0.00000001],
+    #                    'num_batches': [2, 6],
+    #                    'batch_size': [2],
+    #                    'degrees': [1, 2]}
+    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
+    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
     ### Least squares test
     # model = 'least_squares'

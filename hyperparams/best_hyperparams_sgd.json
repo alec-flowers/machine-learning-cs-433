@@ -1,0 +1,1 @@
+{"batch_size": 2, "degrees": 2, "gamma": 1e-14, "max_iters": 500, "num_batches": 2, "model": "sgd"}
