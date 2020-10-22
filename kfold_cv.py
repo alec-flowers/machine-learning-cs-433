@@ -2,7 +2,6 @@ from timeit import default_timer as timer
 
 import numpy as np
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
-from helpers import build_model_data
 from costs import compute_loss
 
 
@@ -17,7 +16,7 @@ def product(*args, repeat=1):
         yield tuple(prod)
 
 
-class ParameterGrid():
+class ParameterGrid:
     def __init__(self, grid):
         grid = [grid]
         self.grid = grid
@@ -53,65 +52,65 @@ def build_k_indices(y, k_fold, seed):
     return np.array(k_indices)
 
 
-def cross_validation(y, x, k_indices, k, hp, model):
+def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     """return the loss of the specified model"""
-    assert k < len(k_indices), 'K is larger than the number of k-folds we create'
-    # get k'th subgroup in test, others in train: TODO
-    train_i = np.concatenate(np.delete(k_indices, k, axis=0))
-    test_i = k_indices[k]
+    if cross_validate:
+        assert k < len(k_indices), 'K is larger than the number of k-folds we create'
+        # get k'th subgroup in test, others in train: TODO
+        train_i = np.concatenate(np.delete(k_indices, k, axis=0))
+        test_i = k_indices[k]
 
-    train_x = x[(train_i)]
-    train_y = y[(train_i)]
-    test_x = x[(test_i)]
-    test_y = y[(test_i)]
+        train_x = x[train_i]
+        train_y = y[train_i]
+        test_x = x[test_i]
+        test_y = y[test_i]
+    else:
+        train_x = x
+        train_y = y
+        test_x = np.zeros(x.shape)
+        test_y = np.zeros(y.shape)
 
     # Calculation of losses using the specified model
     # gradient descent:
-    if (model == 'gd'):
-        initial_w = [0 for _ in range(x.shape[1] + 1)]
+    if model == 'gd':
+        initial_w = [0 for _ in range(x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
-
-        train_y, train_x = build_model_data(train_x, train_y)  # todo: fix
-        test_y, test_x = build_model_data(test_x, test_y)
 
         weights, loss_tr = gradient_descent(train_y, train_x, initial_w, epsilon, gamma)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
-    if (model == 'sgd'):
-        initial_w = [0 for _ in range(x.shape[1] + 1)]
+    elif model == 'sgd':
+        initial_w = [0 for _ in range(x.shape[1])]
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
         epsilon = hp['epsilon']
         gamma = hp['gamma']
-
-        train_y, train_x = build_model_data(train_x, train_y)  # todo: fix
-        test_y, test_x = build_model_data(test_x, test_y)
 
         weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, batch_size, epsilon, gamma,
                                                        num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
-    if (model == 'least_squares'):
+    elif model == 'least_squares':
         weights, loss_tr = least_squares(train_y, train_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # ridge regression:
-    if (model == 'ridge'):
-        lambda_ = hp['lambda']  # todo: degree
+    elif model == 'ridge':
+        lambda_ = hp['lambda']
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
         # calculate the loss for train and test data:
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # logistic regression: TODO
-    if (model == 'logistic'):
+    elif model == 'logistic':
         raise NotImplementedError
 
     # regularized logistic regression: TODO
-    if (model == 'regularized_logistic'):
+    elif model == 'regularized_logistic':
         raise NotImplementedError
 
     return loss_tr, loss_te, weights
