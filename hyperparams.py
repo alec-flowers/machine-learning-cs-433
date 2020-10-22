@@ -55,7 +55,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                 px, ind = build_poly(x, hp['degrees'])
                 poly_dict[hp['degrees']] = px
                 end = timer()
-                print(f'Poly Time: {end-start:.3f}')
+                print(f'Poly Time: {end - start:.3f}')
         else:
             px = x
 
@@ -64,60 +64,62 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         for k in range(k_fold):
             loss_tr, loss_te, weight = cross_validation(y, px, k_indices, k, hp, model)
             loss_list.append(loss_te)
-        loss.append(np.mean(loss_list))   #This is a list of loss* for each group of hyperparameters
+        loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
         weights.append(weight)
         end = timer()
 
-        print(f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f}  Time: {end-start:.3f}')
+        print(f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f}  Time: {end - start:.3f}')
 
-    loss_star = min(loss)   #This is the best loss*, which corresponds to a specific set of hyperparameters
-    hp_star = list(hyperparam)[loss.index(loss_star)]  #this is the hyperparameter that corresponds to the best loss*
+    loss_star = min(loss)  # This is the best loss*, which corresponds to a specific set of hyperparameters
+    hp_star = list(hyperparam)[loss.index(loss_star)]  # this is the hyperparameter that corresponds to the best loss*
     w = weights[loss.index(loss_star)]
 
-    return(hp_star, loss_star, w)
+    return (hp_star, loss_star, w)
 
 
+def save_hyperparams(model, hp_star):
+    filename = f"hyperparams/best_hyperparams_{model}.json"
+    hp_star['model'] = model
+    write_json(filename, hp_star)
 
 
 if __name__ == "__main__":
-    DATA_FOLDER = 'data/'
+    DATA_FOLDER = 'Data/'
     TRAIN_DATASET = DATA_FOLDER + "train.csv"
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample = True)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
     end = timer()
-    print(f'Data Loaded - Time: {end-start:.3f}\n')
+    print(f'Data Loaded - Time: {end - start:.3f}\n')
 
-    ### Ridge Regression test
-    #model = 'ridge'
-    #hyperparameters = {'degrees':[1, 2], 'lambda':np.logspace(-4, 0, 15)}
-    #hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    #print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star}')  #, weights: {weights}')
-
+    ## Ridge Regression test
+    # model = 'ridge'
+    # hyperparameters = {'degrees': [1, 2], 'lambda': np.logspace(-4, 0, 15)}
+    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star}')  # , weights: {weights}')
 
     ### Gradient Descent test
-    #model = 'gd'
-    #hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
+    # model = 'gd'
+    # hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
     #                     'max_iters':[500],
     #                     'gamma':[.00000001]}
-    #hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    #print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
+    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
+    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
     ### Stochastic Gradient Descent test
-    #model = 'sgd'
-    #hyperparameters = {'initial_w': [[0 for _ in range(x.shape[1] + 1)]],
-    #                   'max_iters': [500],
-    #                   'gamma': [.00000001],
-    #                   'num_batches': [2,6],
-    #                   'batch_size': [2]}
-    #hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    #print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
-
-    ### Least squares test
-    model = 'least_squares'
-    hyperparameters = {}  #!!! This one has no hyperparameters, so maybe we should print it differently
+    model = 'sgd'
+    hyperparameters = {'initial_w': [[0 for _ in range(x.shape[1] + 1)]],
+                      'max_iters': [500],
+                      'gamma': [.00000001],
+                      'num_batches': [2,6],
+                      'batch_size': [2]}
     hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
     print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
+    ### Least squares test
+    # model = 'least_squares'
+    # hyperparameters = {'degrees': range(1, 3)}  #!!! This one has no hyperparameters, so maybe we should print it differently
+    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
+    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
 
-    # write_json('ridge_bp.json', hp_star)
+    save_hyperparams(model, hp_star)

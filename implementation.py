@@ -34,7 +34,7 @@ def compute_gradient(y, tx, w):
     return gradient
 
 
-def gradient_descent(y, tx, initial_w, max_iters, gamma, error_type='MSE'):
+def gradient_descent(y, tx, initial_w, epsilon, gamma, error_type='MSE'):
     """Gradient Descent algorithm.
 
     Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -50,8 +50,8 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, error_type='MSE'):
     initial_w : ndarray of shape (n_weights,)
         Weight vector
 
-    max_iters : int
-        number of training epochs
+    epsilon: float
+        do gradient descent until residual is smaller than epsilon
 
     gamma : float
         learing rate
@@ -71,21 +71,23 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, error_type='MSE'):
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
+    residual = 1e100
 
-    for n_iter in range(max_iters):
+    while residual > epsilon:
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
 
         ws.append(w)
         losses.append(loss)
+        residual = abs(losses[-1] - losses[-2])
 
         #print("GD({bi}/{ti}): loss={l:.6f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1]))
 
     return ws[-1], losses[-1]
 
 
-def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, num_batches):
+def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, num_batches):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -105,8 +107,8 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
     batch_size : int
         size of  the batches
 
-    max_iters : int
-        number of training epochs
+    epsilon: float
+        do gradient descent until residual is smaller than epsilon
 
     gamma : float
         learing rate
@@ -129,8 +131,9 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
     W0 = 0
     ws = [initial_w]
     losses = [compute_mse(y, tx, ws[W0])]
+    residual = 1e100
 
-    for n_iter in range(max_iters):
+    while residual > epsilon:
 
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             '''note if we choose a batch_iter(num_batches > 1) then this will not be
@@ -143,6 +146,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
 
             ws.append(w)
             losses.append(loss)
+        residual = abs(losses[-1] - losses[-2])
 
             #print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
