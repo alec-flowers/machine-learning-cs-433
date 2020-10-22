@@ -41,7 +41,7 @@ def rmse(e):
 	return np.sqrt(2 * mse(e))
 
 
-def compute_loss_alec(y, tx, w, error_fn='MSE'):
+def compute_loss(y, tx, w, error_fn='MSE'):
 	"""
 	Calculate the loss between dependent variable and prediction.
 

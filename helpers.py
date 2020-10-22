@@ -31,11 +31,48 @@ def split_data(x, y, ratio, seed=1):
 
 
 def build_poly(x, degree):
-    """polynomial basis functions for input data x, for j=0 up to j=degree."""
-    tx_expanded = np.zeros((x.shape[0], degree + 1))
-    for i in range(degree + 1):
-        tx_expanded[:, i] = x ** i
-    return tx_expanded
+    """Polynomial basis functions for multivariate inputs
+    Parameters
+	----------
+	x : ndarray of shape (n_rows, n_col)
+		Array of training data
+
+	degree : int > 0
+        polynomial degree
+
+	Returns
+	----------
+	poly : np.array (n_rows, expansion)
+		x data expanded to the polynomial degree
+    
+    ind : list (expansion)
+        Expanded terms using index of original X array. (Note am using 1 based indexing)
+
+        ex '111' column 1 of x - c1^3
+        ex '122' means column 1 and column 2 of x - c1*c2^2
+    """
+    assert degree > 0, 'Degree must be a natural number'
+    row = x.shape[0]
+    col = x.shape[1]
+    if degree == 1:
+        return np.c_[np.ones(row), x], [[str(i + 1)] for i in range(col)]
+    if degree >= 2:
+        poly, ind = build_poly(x, degree - 1)
+        set_ind = set(tuple(i) for i in ind)
+
+        p_col = poly.shape[1]
+        for i in range(col):
+            for j in range(1, p_col):
+                temp = sorted(ind[i] + ind[j - 1])
+                set_temp = tuple(temp)
+
+                # To not duplicate data:
+                if (set_temp not in set_ind):
+                    mult = x[:, i] * poly[:, j]
+                    poly = np.c_[poly, mult]  # !ERROR
+                    ind.append(temp)
+                    set_ind.add(set_temp)
+        return poly, ind
 
 
 def load_data(sub_sample=True, add_outlier=False):
@@ -74,10 +111,8 @@ def standardize(x):
     return x, mean_x, std_x
 
 
-def build_model_data(height, weight):
+def build_model_data(x, y):
     """Form (y,tX) to get regression data in matrix form."""
-    y = weight
-    x = height
     num_samples = len(y)
     tx = np.c_[np.ones(num_samples), x]
     return y, tx

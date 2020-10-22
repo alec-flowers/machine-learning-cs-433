@@ -2,7 +2,9 @@
 data/
 Data/
 img/
+venv/
 # ignore intellij stuff
 .idea/
 
 __pycache__/
+
