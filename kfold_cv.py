@@ -98,7 +98,7 @@ def cross_validation(y, x, k_indices, k, hp, model):
 
     # ridge regression:
     if (model == 'ridge'):
-        lambda_ = hp['lambda']
+        lambda_ = hp['lambda'] #todo: degree
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
         # calculate the loss for train and test data:
