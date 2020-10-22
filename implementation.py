@@ -72,8 +72,9 @@ def gradient_descent(y, tx, initial_w, epsilon, gamma, error_type='MSE'):
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
     residual = 1e100
+    i = 0
 
-    while residual > epsilon:
+    while residual > epsilon or i < 1000:
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
@@ -81,6 +82,7 @@ def gradient_descent(y, tx, initial_w, epsilon, gamma, error_type='MSE'):
         ws.append(w)
         losses.append(loss)
         residual = abs(losses[-1] - losses[-2])
+        i += 1
 
         #print("GD({bi}/{ti}): loss={l:.6f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1]))
 
@@ -132,8 +134,9 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
     ws = [initial_w]
     losses = [compute_mse(y, tx, ws[W0])]
     residual = 1e100
+    i = 0
 
-    while residual > epsilon:
+    while residual > epsilon or i < 1000:
 
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             '''note if we choose a batch_iter(num_batches > 1) then this will not be
@@ -147,6 +150,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
             ws.append(w)
             losses.append(loss)
         residual = abs(losses[-1] - losses[-2])
+        i += 1
 
             #print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
@@ -173,11 +177,11 @@ def least_squares(y, tx):
         Optimal weights calculated using normal equations.
 
     loss : np.float64
-        RMSE loss for corresponding weight value
+        MSE loss for corresponding weight value
 
     """
     w = np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
-    loss = compute_loss(y, tx, w, 'RMSE')
+    loss = compute_loss(y, tx, w, 'MSE')
     return w, loss
 
 
@@ -204,7 +208,7 @@ def ridge_regression(y, tx, lambda_):
         Optimal weights calculated using normula equations.
 
     loss : np.float64
-        RMSE loss for corresponding weight value
+        MSE loss for corresponding weight value
 
     """
 
