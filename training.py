@@ -49,7 +49,7 @@ def train(model):
         raise KeyError("Hyperparameters should at least have degree as a key!")
 
     print(f"Starting training of {model}...")
-    loss_tr, _, weight = cross_validation(y, px, [], 0, hyperparameters, model, cross_validate=False)
+    loss_tr, _, _, weight = cross_validation(y, px, [], 0, hyperparameters, model, cross_validate=False)
     print("Finished...")
     print("Loss training: " + str(loss_tr))
     hyperparameters['weights'] = weight.tolist()

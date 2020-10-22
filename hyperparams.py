@@ -48,6 +48,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     # Combination of hyperparameters
     hyperparam = ParameterGrid(hyperparameters)
     loss = []
+    accuracy = []
     weights = []
     poly_dict = {}
 
@@ -55,6 +56,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     for hp in hyperparam:
         k_indices = build_k_indices(y, k_fold, seed)
         loss_list = []
+        acc_list = []
 
         # Making polynomial if asked
         if 'degrees' in hyperparameters.keys():
@@ -74,19 +76,26 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
-            loss_tr, loss_te, weight = cross_validation(y, px, k_indices, k, hp, model)
+            loss_tr, loss_te, acc, weight = cross_validation(y, px, k_indices, k, hp, model)
             loss_list.append(loss_te)
+            acc_list.append(acc)
         loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
+        accuracy.append(np.mean(acc_list))
         weights.append(weight)
         end = timer()
 
-        print(f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f}  Time: {end - start:.3f}')
+        print(
+            f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {end - start:.3f}')
 
-    loss_star = min(loss)  # This is the best loss*, which corresponds to a specific set of hyperparameters
-    hp_star = list(hyperparam)[loss.index(loss_star)]  # this is the hyperparameter that corresponds to the best loss*
-    w = weights[loss.index(loss_star)]
+    # loss_star = min(loss)  # This is the best loss*, which corresponds to a specific set of hyperparameters
+    # hp_star = list(hyperparam)[loss.index(loss_star)]  # this is the hyperparameter that corresponds to the best loss*
 
-    return hp_star, loss_star, w
+    min_acc_idx = np.argmax(accuracy)  # This is the index of the best accuracy
+    acc_star = accuracy[min_acc_idx]
+    hp_star = list(hyperparam)[min_acc_idx]  # corresponding hyperparameters
+    w = weights[min_acc_idx]  # corresponding weights
+
+    return hp_star, acc_star, w
 
 
 def save_hyperparams(model, hp_star):

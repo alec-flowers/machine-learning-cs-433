@@ -2,7 +2,7 @@ from timeit import default_timer as timer
 
 import numpy as np
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
-from costs import compute_loss
+from costs import compute_loss, calc_accuracy
 
 
 def product(*args, repeat=1):
@@ -113,4 +113,6 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     elif model == 'regularized_logistic':
         raise NotImplementedError
 
-    return loss_tr, loss_te, weights
+    acc = calc_accuracy(test_y, test_x, weights)
+
+    return loss_tr, loss_te, acc, weights
