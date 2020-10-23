@@ -2,7 +2,9 @@ from timeit import default_timer as timer
 
 import numpy as np
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
+from data_process import impute, normalize
 from costs import compute_loss, calc_accuracy
+from helpers import build_poly
 
 
 def product(*args, repeat=1):
@@ -54,6 +56,8 @@ def build_k_indices(y, k_fold, seed):
 
 def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     """return the loss of the specified model"""
+    #poly_dict = {}
+
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
         # get k'th subgroup in test, others in train: TODO
@@ -69,6 +73,33 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         train_y = y
         test_x = np.zeros(x.shape)
         test_y = np.zeros(y.shape)
+
+    train_x = impute(train_x, 'median') 
+    train_x = normalize(train_x)
+    test_x = impute(test_x, 'median')
+    test_x = normalize(test_x)
+
+    split = train_x.shape[0]
+    temp_x = np.append(train_x, test_x, axis = 0)
+
+    # Making polynomial if asked
+    if 'degrees' in hp.keys():
+        # Checks if the polynomial has already been calculated
+        #if hp['degrees'] in poly_dict:
+        #    px = poly_dict[hp['degrees']]
+        # Calculates the polynomial and saves it in a dictionary
+        #else:
+
+        start = timer()
+        poly_x, _ = build_poly(temp_x, hp['degrees'])
+        #poly_dict[hp['degrees']] = px
+        end = timer()
+        print(f'Poly Time: {end - start:.3f}')
+    else:
+        raise KeyError('Hyperparameter should have at least degree = 1')
+
+    train_x = poly_x[:split]
+    test_x = poly_x[split:]
 
     # Calculation of losses using the specified model
     # gradient descent:
