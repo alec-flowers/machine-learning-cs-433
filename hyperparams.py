@@ -6,7 +6,7 @@ from os import path
 
 from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices
-from helpers import write_json, build_poly, read_json
+from helpers import write_json, read_json
 
 
 def parse_args():
@@ -50,7 +50,6 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     loss = []
     accuracy = []
     weights = []
-    poly_dict = {}
 
     # Loop over different combinations of hyperparameters to find the best one
     for hp in hyperparam:
@@ -58,25 +57,10 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         loss_list = []
         acc_list = []
 
-        # Making polynomial if asked
-        if 'degrees' in hyperparameters.keys():
-            # Checks if the polynomial has already been calculated
-            if hp['degrees'] in poly_dict:
-                px = poly_dict[hp['degrees']]
-            # Calculates the polynomial and saves it in a dictionary
-            else:
-                start = timer()
-                px, _ = build_poly(x, hp['degrees'])
-                poly_dict[hp['degrees']] = px
-                end = timer()
-                print(f'Poly Time: {end - start:.3f}')
-        else:
-            raise KeyError('Hyperparameter should have at least degree=1')
-
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
-            loss_tr, loss_te, acc, weight = cross_validation(y, px, k_indices, k, hp, model)
+            loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hp, model)
             loss_list.append(loss_te)
             acc_list.append(acc)
         loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
@@ -85,7 +69,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         end = timer()
 
         print(
-            f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {end - start:.3f}')
+            f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {(end - start):.3f}')
 
     # loss_star = min(loss)  # This is the best loss*, which corresponds to a specific set of hyperparameters
     # hp_star = list(hyperparam)[loss.index(loss_star)]  # this is the hyperparameter that corresponds to the best loss*
@@ -114,12 +98,12 @@ def read_hyperparam_input(model):
     # model = "gd"
 
     DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
+    TRAIN_DATASET = path.join(DATA_FOLDER, "p_train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
     hyperparameters = read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
     end = timer()
     print(f'Data Loaded - Time: {end - start:.3f}\n')

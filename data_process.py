@@ -18,7 +18,7 @@ def impute(data, how = 'median'):
 
     return data
 
-def normalization(data):
+def normalize(data):
     '''
     Normalize data and subtract mean divide by standard deviation.
     '''
@@ -29,7 +29,7 @@ def normalization(data):
     return data
 
 def main():
-    yb_data_train, input_data_train, ids_train = load_csv_data("Data/train.csv", sub_sample = False)
+    y, input_data_train, ids = load_csv_data("Data/train.csv", sub_sample = False)
     #yb_data_test, input_data_test, ids_test = load_csv_data("Data/test.csv")
     x = input_data_train
 
@@ -37,7 +37,7 @@ def main():
     #column 9 stays delete (21, 29)
     x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
 
-    data = np.c_[ids_train, yb_data_train, x]
+    data = np.c_[ids, y , x]
     start = timer()
     save_csv_data('./Data/p_train.csv', data)
     end = timer()
