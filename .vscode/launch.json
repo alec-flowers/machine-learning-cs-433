@@ -4,6 +4,8 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+
         {
             "name": "data_process",
             "type": "python",
@@ -15,7 +17,7 @@
             "type": "python",
             "request": "launch",
             "program": "./hyperparams.py",
-            "args": ["-m", "least_squares"]
+            "args": ["-m", "ridge"]
         }
     ]
 }
