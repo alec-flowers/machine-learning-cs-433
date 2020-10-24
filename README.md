@@ -35,11 +35,11 @@ b) The second workflow is for creating the best model and weights for a submissi
     ```
     Where `<name_of_model>` is a choice between: 'gd', 'sgd', 'ridge', 'least_squares', 'logistic' and 'regularized_logistic', corresponding to each machine learning method.
 3) The computed weights and the corresponding hyperparameters will be saved at `~\hyperparams`, with the file name `weights_{model}.json` according to the method. 
-4) Run `run.py   !!!!!
+4) Run `run.py`   !!!!!
 
-```
-$ python3 run.py
-```
+    ```
+    $ python3 run.py
+    ```
 
 
 
@@ -50,7 +50,7 @@ Project
 |
 |-- Data
 |   |-- test.csv
-|    |-- train.csv
+|   |-- train.csv
 |
 |-- hyperparams
 |    |-- best_hyperparams_gd.json
