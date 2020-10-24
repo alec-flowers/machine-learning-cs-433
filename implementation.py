@@ -109,7 +109,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
     batch_size : int
         size of  the batches
 
-    epsilon: float
+    epsilon : float
         do gradient descent until residual is smaller than epsilon
 
     gamma : float
@@ -233,7 +233,6 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
     losses = []
     ws = [initial_w]
     for iter in range(max_iters):
-        # loss, w = learning_by_stochastic_gradient_descent(y, tx, w, batch_size, gamma, num_batches)
 
         # Learning by stochastic gradient descent
         w = ws[-1]

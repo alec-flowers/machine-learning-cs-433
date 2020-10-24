@@ -8,6 +8,8 @@ from helpers import read_json, build_poly, write_json
 from kfold_cv import cross_validation
 
 
+# Training ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="CLI for the training.py which finds the trains a given model with its best hyperparameters.")
@@ -19,25 +21,11 @@ def parse_args():
     return args
 
 
-def read_training_input(model):
-    # model = 'gd'
-
-    HYPERPARAMS_FOLDER = 'hyperparams/'
-    HYPERPARAMS_BEST_VALUES = f'best_hyperparams_{model}.json'
-    DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
-
-    filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)
-
-    start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
-    print(f'Data Loaded - Time: {timer() - start:.3f}\n')
-    hyperparameters = read_json(filename)
-
-    return y, x, ids_train, hyperparameters
-
-
 def train(model):
+    """
+    Main function which trains a given model (['gd', 'sgd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
+    using K-fold Cross Validation, finds and saves the weights with the corresponding hyperparameters.
+    """
     y, x, ids_train, hyperparameters = read_training_input(model)
 
     # build polynomial from hyperparams
@@ -58,6 +46,45 @@ def train(model):
     WEIGHTS_FILENAME = f"weights_{model}.json"
     print(f"Saving weights and corresponding hyperparameters to {path.join(WEIGHTS_DIR, WEIGHTS_FILENAME)}")
     write_json(path.join(WEIGHTS_DIR, WEIGHTS_FILENAME), hyperparameters)
+
+
+def read_training_input(model):
+    """
+    Reads the input best performing set of hyperparameters for a given model and loads training data.
+
+    Parameters
+    ----------
+    model : string selecting ['gd', 'sgd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic']
+        Machine learning methods
+
+    Returns
+    ----------
+    y : ndarray of shape (n_samples,)
+        Array of labels
+
+    x : ndarray of shape (n_samples, n_features)
+        Training data
+
+    ids_train : ndarray of shape (n_samples,)
+        IDs of data
+
+    hyperparameters : dict containing the best performing set of hyperparameters
+    """
+
+    HYPERPARAMS_FOLDER = 'hyperparams/'
+    HYPERPARAMS_BEST_VALUES = f'best_hyperparams_{model}.json'
+    DATA_FOLDER = 'Data/'
+    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
+
+    filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)
+
+    start = timer()
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    print(f'Data Loaded - Time: {timer() - start:.3f}\n')
+    hyperparameters = read_json(filename)
+
+    return y, x, ids_train, hyperparameters
+
 
 
 if __name__ == '__main__':

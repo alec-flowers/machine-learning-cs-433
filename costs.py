@@ -12,7 +12,7 @@ def compute_error(y, tx, w):
 
 
 def compute_mse(y, tx, w):
-    """Calculate the loss using MSE (Mean Squared Error). """
+    """Calculates the loss using MSE (Mean Squared Error). """
     N = len(y)
     e = compute_error(y, tx, w)
     loss = 1 / (2 * N) * np.sum(e ** 2)
@@ -20,7 +20,7 @@ def compute_mse(y, tx, w):
 
 
 def compute_mae(y, tx, w):
-    """Calculate the loss using MAE (Mean Absolute Error)."""
+    """Calculates the loss using MAE (Mean Absolute Error)."""
     N = len(y)
     e = compute_error(y, tx, w)
     loss = 1 / (2 * N) * np.sum(np.abs(e))
@@ -28,23 +28,23 @@ def compute_mae(y, tx, w):
 
 
 def mse(e):
-    'Calculates and returns MSE between two vectors of same size'
+    """Calculates and returns MSE between two vectors of same size"""
     return np.sum(e ** 2) / (2 * len(e))
 
 
 def mae(e):
-    'Calculates and returns MAE between two vectors of same size'
+    """Calculates and returns MAE between two vectors of same size"""
     return np.sum(np.abs(e)) / len(e)
 
 
 def rmse(e):
-    'Calculates and returns RMSE between two vectors of same size'
+    """Calculates and returns RMSE between two vectors of same size"""
     return np.sqrt(2 * mse(e))
 
 
 def compute_loss(y, tx, w, error_fn='MSE'):
     """
-    Calculate the loss between dependent variable and prediction.
+    Calculates the loss between dependent variable and prediction.
 
     Parameters
     ----------
@@ -84,12 +84,12 @@ def calc_accuracy(y_actual, tx, w):
     return correct / len(y_actual)
 
 def sigmoid(t):
-    """apply the sigmoid function on t."""
+    """Applies the sigmoid function on t."""
     sigmoid = 1 / (1 + np.exp(-t))
     return sigmoid
 
 def calculate_logistic_loss(y, tx, w):
-	"""compute the loss: negative log likelihood."""
+	"""Computes the loss: negative log likelihood."""
 	pred = sigmoid(tx @ w)
 	loss1 = y.T.dot(np.log(pred))
 	loss2 = (1-y).T.dot(np.log(1-pred))

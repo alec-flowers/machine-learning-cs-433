@@ -1,1 +1,1 @@
-{"degrees": 2, "epsilon": 1e-06, "gamma": 1e-14, "model": "gd"}
+{"degrees": 1, "epsilon": 0.001, "gamma": 1e-09, "model": "gd"}

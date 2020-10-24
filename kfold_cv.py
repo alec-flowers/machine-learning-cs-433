@@ -25,7 +25,7 @@ class ParameterGrid:
         self.grid = grid
 
     def __iter__(self):
-        """Iterate over the points in the grid.
+        """Iterates over the points in the grid.
         Returns
         -------
         params : iterator over dict of str to any
@@ -45,7 +45,7 @@ class ParameterGrid:
 
 
 def build_k_indices(y, k_fold, seed):
-    """build k indices for k-fold."""
+    """Builds k indices for k-fold."""
     num_row = y.shape[0]
     interval = int(num_row / k_fold)
     np.random.seed(seed)
@@ -56,7 +56,7 @@ def build_k_indices(y, k_fold, seed):
 
 
 def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
-    """return the loss of the specified model"""
+    """Returns the loss of the specified model."""
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
         # get k'th subgroup in test, others in train: TODO
@@ -83,15 +83,8 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # Making polynomial if asked
     if 'degrees' in hp.keys():
-        # Checks if the polynomial has already been calculated
-        #if hp['degrees'] in poly_dict:
-        #    px = poly_dict[hp['degrees']]
-        # Calculates the polynomial and saves it in a dictionary
-        #else:
-
         start = timer()
         poly_x, _ = build_poly(temp_x, hp['degrees'])
-        #poly_dict[hp['degrees']] = px
         end = timer()
         print(f'Poly Time: {end - start:.3f}')
     else:
