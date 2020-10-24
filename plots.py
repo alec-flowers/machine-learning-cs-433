@@ -78,3 +78,37 @@ def gradient_descent_visualization(
     ax2.plot(pred_x, pred_y, 'r')
 
     return fig
+
+
+from training import read_training_set, read_best_hyperparameters
+from kfold_cv import build_k_indices, cross_validation
+from helpers import models, model_to_string
+
+
+def viz_accuracy(k_fold=20, seed=1):
+    fig, axs = plt.subplots(nrows=2, ncols=1)
+    y, x, ids_train = read_training_set()
+    all_accuracies = []
+    all_losses = []
+    for model in models:
+        hyperparameters = read_best_hyperparameters(model)
+        losses = []
+        accuracies = []
+        k_indices = build_k_indices(y, k_fold, seed)
+        for k in range(k_fold):
+            loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hyperparameters, model)
+            losses.append(loss_te)
+            accuracies.append(acc)
+        print(f'Model: {model}')
+        print(f'Hyperparameters: {hyperparameters}  Avg Loss: {np.mean(losses):.5f} Avg Accuracy: {np.mean(accuracies):.4f}')
+        all_accuracies.append(accuracies)
+        all_losses.append(losses)
+    axs[0].boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
+    axs[1].boxplot(all_losses, labels=[model_to_string[model] for model in models])
+    axs[0].set_title("Boxplot of the Accuracy")
+    axs[0].set_ylabel("Accuracy")
+    axs[1].set_title("Boxplot of the Loss")
+    axs[1].set_ylabel("Loss")
+    plt.show()
+
+viz_accuracy()

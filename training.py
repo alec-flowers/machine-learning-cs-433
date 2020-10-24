@@ -19,26 +19,29 @@ def parse_args():
     return args
 
 
-def read_training_input(model):
-    # model = 'gd'
-
+def read_best_hyperparameters(model):
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_BEST_VALUES = f'best_hyperparams_{model}.json'
+    filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)
+    return read_json(filename)
+
+
+def read_training_set():
+    # model = 'gd'
+
     DATA_FOLDER = 'Data/'
     TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
-
-    filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)
 
     start = timer()
     y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
     print(f'Data Loaded - Time: {timer() - start:.3f}\n')
-    hyperparameters = read_json(filename)
 
-    return y, x, ids_train, hyperparameters
+    return y, x, ids_train
 
 
 def train(model):
-    y, x, ids_train, hyperparameters = read_training_input(model)
+    y, x, ids_train = read_training_set()
+    hyperparameters = read_best_hyperparameters(model)
 
     # build polynomial from hyperparams
     if 'degrees' in hyperparameters.keys():

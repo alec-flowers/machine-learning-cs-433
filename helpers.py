@@ -4,6 +4,11 @@
 import numpy as np
 import json
 
+models = ["gd", "sgd", "ridge", "least_squares", "logistic", "regularized_logistic"]
+model_to_string = {
+    "gd": "GD", "sgd": "SGD", "ridge": "RIDGE", "least_squares": "LS", "logistic": "LR", "regularized_logistic": "LRL"
+}
+
 
 def split_data(x, y, ratio, seed=1):
     """
