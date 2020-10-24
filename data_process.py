@@ -2,6 +2,16 @@ from timeit import default_timer as timer
 from proj1_helpers import load_csv_data, save_csv_data
 import numpy as np
 
+def standardize(data):
+    '''
+    Standardize data and subtract mean divide by standard deviation.
+    '''
+    mean = np.nanmean(data, axis=0)
+    std = np.nanstd(data, axis=0)
+    data = (data - mean) / std
+
+    return data
+
 def impute(data, how = 'median'):
     '''
     Imputes the -999 values with either the mean or median of the column.
@@ -19,13 +29,9 @@ def impute(data, how = 'median'):
     return data
 
 def normalize(data):
-    '''
-    Normalize data and subtract mean divide by standard deviation.
-    '''
-    mean = np.nanmean(data, axis = 0)
-    std = np.nanstd(data, axis = 0)
-    data = (data - mean) / std
-
+    max = np.amax(data, axis = 0)
+    min = np.amin(data, axis = 0)
+    data = (data-min) / (max-min)
     return data
 
 def main():

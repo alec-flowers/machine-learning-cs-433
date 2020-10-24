@@ -159,8 +159,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         batch_size = hp['batch_size']
 
         weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size,
-                                                           num_batches)
+                                                           lambda_, batch_size, num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
 

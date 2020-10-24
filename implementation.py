@@ -161,7 +161,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
 """ Least squares """
 
 def least_squares(y, tx):
-    """Least Squares
+    """Least Squares algorithm.
 
     Parameters
     ----------
@@ -189,7 +189,7 @@ def least_squares(y, tx):
 """Ridge regression"""
 
 def ridge_regression(y, tx, lambda_):
-    """Ridge Regression
+    """Ridge Regression algorithm.
 
     Parameters
     ----------
@@ -222,8 +222,28 @@ def ridge_regression(y, tx, lambda_):
 
 
 """Logistic regression"""
+
 def calculate_gradient_logistic(y, tx, w):
-    """compute the gradient of loss."""
+    """Compute a gradient for Logistic Regression loss.
+
+        Parameters
+        ----------
+        y : ndarray of shape (n_samples,)
+            Array of labels
+
+        tx : ndarray of shape (n_samples, n_features)
+            Training data
+
+        w : ndarray of shape (n_weights,)
+            Weight vector
+
+        Returns
+        ----------
+        gradient : ndarray of shape (n_weights, )
+            gradient of Logistic Regression loss
+
+        """
+
     gradient = tx.T @ (sigmoid(tx @ w) - y)
     return gradient
 
@@ -233,17 +253,16 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
     losses = []
     ws = [initial_w]
     for iter in range(max_iters):
-        # loss, w = learning_by_stochastic_gradient_descent(y, tx, w, batch_size, gamma, num_batches)
 
         # Learning by stochastic gradient descent
         w = ws[-1]
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            gradient = calculate_gradient_logistic(y, tx, w)  # this is a subgradient
+            gradient = calculate_gradient_logistic(y, tx, w)
             w = w - gamma * gradient
             loss = calculate_logistic_loss(y, tx, w)
 
-        losses.append(loss)  # we take the last value of loss and w !!!!!
-        ws.append(w)  # we take the last value of loss and w !!!!!
+        losses.append(loss)
+        ws.append(w)
 
         if iter % 100 == 0:
             print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
@@ -255,16 +274,18 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
     return ws[-1], losses[-1]
 
 
-# Regularized logistic regression (using SGD): TODO: check
-def regularized_logistic_regression(y, tx, initial_w, max_iter, threshold, gamma, lambda_, batch_size = 1,
+# Regularized logistic regression (using SGD):
+def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, lambda_, batch_size = 1,
                                           num_batches = 1):
     losses = []
     ws = [initial_w]
-    for iter in range(max_iter):
+    for iter in range(max_iters):
         # Learning by stochastic gradient descent
         w = ws[-1]
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            gradient = calculate_gradient_logistic(y, tx, w) + 2 * lambda_ * w
+            gradient = calculate_gradient_logistic(y, tx, w)
+            lamb = 2 * lambda_ * np.array(w)
+            gradient = gradient + lamb
             w = w - gamma * gradient
             loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
 

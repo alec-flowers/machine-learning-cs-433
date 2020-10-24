@@ -89,12 +89,13 @@ def sigmoid(t):
     return sigmoid
 
 def calculate_logistic_loss(y, tx, w):
-	"""compute the loss: negative log likelihood."""
-	pred = sigmoid(tx @ w)
-	loss1 = y.T.dot(np.log(pred))
-	loss2 = (1-y).T.dot(np.log(1-pred))
-	loss = loss1 + loss2
-	return np.squeeze(-loss)
+    """compute the loss: negative log likelihood."""
+    pred = sigmoid(tx @ w)
+    loss1 = y.T.dot(np.log(pred))
+    loss2 = (1-y).T.dot(np.log(1-pred))
+    loss = loss1 + loss2
+    N = len(y) ###!!!!!
+    return np.squeeze(-loss)/N
     #### JANET:
     #log = np.sum(np.log(1 + np.exp(tx @ w)))
     #minus = - np.sum(y * (tx @ w))
