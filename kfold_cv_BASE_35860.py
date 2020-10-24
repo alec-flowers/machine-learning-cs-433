@@ -1,11 +1,8 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
-    logistic_regression, regularized_logistic_regression
-from data_process import impute, normalize
-from costs import compute_loss, calc_accuracy
-from helpers import build_poly
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
+from costs import compute_loss
 
 
 def product(*args, repeat=1):
@@ -73,37 +70,10 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         test_x = np.zeros(x.shape)
         test_y = np.zeros(y.shape)
 
-    train_x = impute(train_x, 'median') 
-    train_x = normalize(train_x)
-    test_x = impute(test_x, 'median')
-    test_x = normalize(test_x)
-
-    split = train_x.shape[0]
-    temp_x = np.append(train_x, test_x, axis = 0)
-
-    # Making polynomial if asked
-    if 'degrees' in hp.keys():
-        # Checks if the polynomial has already been calculated
-        #if hp['degrees'] in poly_dict:
-        #    px = poly_dict[hp['degrees']]
-        # Calculates the polynomial and saves it in a dictionary
-        #else:
-
-        start = timer()
-        poly_x, _ = build_poly(temp_x, hp['degrees'])
-        #poly_dict[hp['degrees']] = px
-        end = timer()
-        print(f'Poly Time: {end - start:.3f}')
-    else:
-        raise KeyError('Hyperparameter should have at least degree = 1')
-
-    train_x = poly_x[:split]
-    test_x = poly_x[split:]
-
     # Calculation of losses using the specified model
     # gradient descent:
     if model == 'gd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
 
@@ -112,7 +82,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # stochastic gradient descent:
     elif model == 'sgd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
         epsilon = hp['epsilon']
@@ -137,33 +107,10 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # logistic regression: TODO
     elif model == 'logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
-        max_iters = hp['max_iters']
-        threshold = hp['threshold']
-        gamma = hp['gamma']
-        num_batches = hp['num_batches']
-        batch_size = hp['batch_size']
-
-        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
-                                               num_batches)
-        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
+        raise NotImplementedError
 
     # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
-        max_iters = hp['max_iters']
-        threshold = hp['threshold']
-        gamma = hp['gamma']
-        lambda_ = hp['lambda_']
-        num_batches = hp['num_batches']
-        batch_size = hp['batch_size']
+        raise NotImplementedError
 
-        weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size,
-                                                           num_batches)
-        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
-
-
-    acc = calc_accuracy(test_y, test_x, weights)
-
-    return loss_tr, loss_te, acc, weights
+    return loss_tr, loss_te, weights

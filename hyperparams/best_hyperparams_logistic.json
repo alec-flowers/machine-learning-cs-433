@@ -1,0 +1,1 @@
+{"batch_size": 2, "degrees": 1, "gamma": 1e-14, "max_iters": 100, "num_batches": 2, "threshold": 100, "model": "logistic"}

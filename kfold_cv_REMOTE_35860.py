@@ -1,8 +1,7 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
-    logistic_regression, regularized_logistic_regression
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
 from data_process import impute, normalize
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
@@ -57,6 +56,8 @@ def build_k_indices(y, k_fold, seed):
 
 def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     """return the loss of the specified model"""
+    #poly_dict = {}
+
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
         # get k'th subgroup in test, others in train: TODO
@@ -103,7 +104,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     # Calculation of losses using the specified model
     # gradient descent:
     if model == 'gd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
 
@@ -112,7 +113,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # stochastic gradient descent:
     elif model == 'sgd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
         epsilon = hp['epsilon']
@@ -137,32 +138,11 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # logistic regression: TODO
     elif model == 'logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
-        max_iters = hp['max_iters']
-        threshold = hp['threshold']
-        gamma = hp['gamma']
-        num_batches = hp['num_batches']
-        batch_size = hp['batch_size']
-
-        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
-                                               num_batches)
-        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
+        raise NotImplementedError
 
     # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
-        max_iters = hp['max_iters']
-        threshold = hp['threshold']
-        gamma = hp['gamma']
-        lambda_ = hp['lambda_']
-        num_batches = hp['num_batches']
-        batch_size = hp['batch_size']
-
-        weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size,
-                                                           num_batches)
-        loss_te = compute_loss(test_y, test_x, weights, 'MSE')
-
+        raise NotImplementedError
 
     acc = calc_accuracy(test_y, test_x, weights)
 

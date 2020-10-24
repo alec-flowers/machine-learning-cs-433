@@ -32,8 +32,7 @@
   "least_squares": {
     "degrees": [
       1,
-      2,
-      3
+      2
     ]
   },
   "ridge": {

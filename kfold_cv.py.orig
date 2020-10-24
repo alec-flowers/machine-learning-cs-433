@@ -1,11 +1,16 @@
 from timeit import default_timer as timer
 
 import numpy as np
+<<<<<<< HEAD
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
     logistic_regression, regularized_logistic_regression
+from costs import compute_loss
+=======
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares
 from data_process import impute, normalize
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
+>>>>>>> master
 
 
 def product(*args, repeat=1):
@@ -57,6 +62,8 @@ def build_k_indices(y, k_fold, seed):
 
 def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     """return the loss of the specified model"""
+    #poly_dict = {}
+
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
         # get k'th subgroup in test, others in train: TODO
@@ -103,7 +110,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     # Calculation of losses using the specified model
     # gradient descent:
     if model == 'gd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
 
@@ -112,7 +119,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # stochastic gradient descent:
     elif model == 'sgd':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
         epsilon = hp['epsilon']
@@ -132,12 +139,11 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         lambda_ = hp['lambda']
 
         weights, loss_tr = ridge_regression(train_y, train_x, lambda_)
-        # calculate the loss for train and test data:
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # logistic regression: TODO
     elif model == 'logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         max_iters = hp['max_iters']
         threshold = hp['threshold']
         gamma = hp['gamma']
@@ -150,7 +156,7 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
 
     # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
-        initial_w = [0 for _ in range(train_x.shape[1])]
+        initial_w = [0 for _ in range(x.shape[1])]
         max_iters = hp['max_iters']
         threshold = hp['threshold']
         gamma = hp['gamma']
