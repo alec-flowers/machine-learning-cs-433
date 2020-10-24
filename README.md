@@ -21,6 +21,11 @@ There are two workflows that we have built which serve seperate purposes.
 
 ## Instructions for optimal weights selection & submission
 
+# Learning to discover: the Higgs boson Machine Learning challenge
+
+The Higgs boson is a particle which gives mass to other elementary particles. In this project, we are using data provided by the ATLAS collaboration at CERN and perform machine learning methods to predict signal or background.
+=======
+
 
 ## File Structure
 Here is the file structure of the project: 

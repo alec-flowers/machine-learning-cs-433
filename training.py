@@ -12,7 +12,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="CLI for the training.py which finds the trains a given model with its best hyperparameters.")
     parser.add_argument('-m', '--method', type=str, help='Which method to train.', required=True,
-                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
+                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
 
     args = parser.parse_args()
 
