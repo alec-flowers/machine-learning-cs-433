@@ -12,7 +12,7 @@ from helpers import write_json, read_json
 def parse_args():
     parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
     parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
-                        choices=['sgd', 'gd', 'ridge', 'least_squares'])
+                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
 
     args = parser.parse_args()
 
@@ -95,8 +95,6 @@ def find_hyperparams(model):
 
 
 def read_hyperparam_input(model):
-    # model = "gd"
-
     DATA_FOLDER = 'Data/'
     TRAIN_DATASET = path.join(DATA_FOLDER, "p_train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
@@ -114,33 +112,3 @@ def read_hyperparam_input(model):
 if __name__ == "__main__":
     args = parse_args()
     find_hyperparams(args.method)
-
-    ## Ridge Regression test
-    # model = 'ridge'
-    # hyperparameters = {'degrees': [1, 2], 'lambda': np.logspace(-4, 0, 15)}
-    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star}')  # , weights: {weights}')
-
-    ### Gradient Descent test
-    # model = 'gd'
-    # hyperparameters = {'initial_w':[[0 for _ in range(x.shape[1]+1)]],
-    #                     'epsilon':[1e-3],
-    #                     'gamma':[.00000001]}
-    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
-
-    ### Stochastic Gradient Descent test
-    # model = 'sgd'
-    # hyperparameters2 = {'epsilon': [1e-3],
-    #                    'gamma': [0.00000001],
-    #                    'num_batches': [2, 6],
-    #                    'batch_size': [2],
-    #                    'degrees': [1, 2]}
-    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')
-
-    ### Least squares test
-    # model = 'least_squares'
-    # hyperparameters = {'degrees': range(1, 3)}  #!!! This one has no hyperparameters, so maybe we should print it differently
-    # hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=2, seed=1)
-    # print(f'Best Parameters found with {model}: - loss*: {loss_star:.5f}, hp*: {hp_star} , weights: {weights}')

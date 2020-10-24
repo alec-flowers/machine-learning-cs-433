@@ -222,62 +222,61 @@ def ridge_regression(y, tx, lambda_):
 
 
 """Logistic regression"""
-def sigmoid(t):
-    """apply the sigmoid function on t."""
-    sigmoid = 1 / (1 + np.exp(-t))
-    return sigmoid
-
-def calculate_logistic_loss(y, tx, w):
-    """compute the loss: negative log likelihood."""
-    log = np.sum(np.log(1 + np.exp(tx @ w)))
-    minus = - np.sum(y * tx @ w)
-    loss = minus + log
-    return loss
-
 def calculate_gradient_logistic(y, tx, w):
     """compute the gradient of loss."""
     gradient = tx.T @ (sigmoid(tx @ w) - y)
     return gradient
 
 
-def learning_by_gradient_descent(y, tx, w, gamma):
-    """
-    Do one step of gradient descent using logistic regression.
-    Return the loss and the updated w.
-    """
-    loss = calculate_logistic_loss(y, tx, w)
-    gradient = calculate_gradient_logistic(y, tx, w)
-    w = w - gamma * gradient
-    return loss, w
-
-def learning_by_subgradient_descent(y, tx, w, gamma):
-    #TODO: do it, (it's just a copy of gradient descent now) and check logistic regression
-    """
-    Do one step of subgradient descent using logistic regression.
-    Return the loss and the updated w.
-    """
-    loss = calculate_logistic_loss(y, tx, w)
-    gradient = calculate_gradient_logistic(y, tx, w)
-    w = w - gamma * gradient
-    return loss, w
-
-def logistic_regression(y, tx, max_iter, threshold, gamma, loss_minimization='gd'):
-    # Logistic regression (using GD or SGD):
+def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_size=1, num_batches=1):
+    # Logistic regression (using Stochastic Gradient Descent):
     losses = []
-    for iter in range(max_iter):
-        if (loss_minimization=='gd'):
-            loss, w = learning_by_gradient_descent(y, tx, w, gamma)
-        elif (loss_minimization == 'sgd'):
-            loss, w = learning_by_subgradient_descent(y, tx, w, gamma, )
+    ws = [initial_w]
+    for iter in range(max_iters):
+        # loss, w = learning_by_stochastic_gradient_descent(y, tx, w, batch_size, gamma, num_batches)
+
+        # Learning by stochastic gradient descent
+        w = ws[-1]
+        for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
+            gradient = calculate_gradient_logistic(y, tx, w)  # this is a subgradient
+            w = w - gamma * gradient
+            loss = calculate_logistic_loss(y, tx, w)
+
+        losses.append(loss)  # we take the last value of loss and w !!!!!
+        ws.append(w)  # we take the last value of loss and w !!!!!
 
         if iter % 100 == 0:
             print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+
         # converge criterion
-        losses.append(loss)
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
     print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+    return ws[-1], losses[-1]
 
 
+# Regularized logistic regression (using SGD): TODO: check
+def regularized_logistic_regression(y, tx, initial_w, max_iter, threshold, gamma, lambda_, batch_size = 1,
+                                          num_batches = 1):
+    losses = []
+    ws = [initial_w]
+    for iter in range(max_iter):
+        # Learning by stochastic gradient descent
+        w = ws[-1]
+        for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
+            gradient = calculate_gradient_logistic(y, tx, w) + 2 * lambda_ * w
+            w = w - gamma * gradient
+            loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
 
-# Regularized logistic regression (using GD or SGD): TODO
+        losses.append(loss)
+        ws.append(w)
+
+        if iter % 100 == 0:
+            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+
+        # converge criterion
+        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+            break
+    print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+    return ws[-1], losses[-1]
+
