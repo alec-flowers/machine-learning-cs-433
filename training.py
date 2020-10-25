@@ -34,7 +34,7 @@ def read_training_set():
     TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
     print(f'Data Loaded - Time: {timer() - start:.3f}\n')
 
     return y, x, ids_train
@@ -56,7 +56,7 @@ def train(model, seed=1):
     hyperparameters = {key: hyperparameters[key][0] for key in hyperparameters.keys()}
     train_x, train_y, test_x, test_y = build_folds(y, x, [], -1, hyperparameters, cross_validate=False)
     print(f"Starting training of {model}...")
-    loss_tr, _, _, weight = cross_validation(train_x, train_y, test_x, test_y, hyperparameters, model)
+    loss_tr, _, _, weight, _ = cross_validation(train_x, train_y, test_x, test_y, hyperparameters, model)
     print("Finished...")
     print("Loss training: " + str(loss_tr))
     hyperparameters['weights'] = weight.tolist()
