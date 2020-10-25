@@ -1,10 +1,14 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, logistic_regression, regularized_logistic_regression
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
+    logistic_regression, regularized_logistic_regression
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
 from data_process import impute, normalize, standardize
+
+
+# K-Fold Cross Validation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def product(*args, repeat=1):
     # product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
@@ -52,7 +56,9 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
+
+def build_folds(y, x, k_indices, k, hp, cross_validate=True):
+    print("Starting Pre-Processing...")
     x[x <= -999] = np.nan
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
@@ -70,24 +76,17 @@ def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
         test_x = np.zeros(x.shape)
         test_y = np.zeros(y.shape)
 
-    train_median = np.nanmedian(train_x, axis = 0)
+    train_median = np.nanmedian(train_x, axis=0)
     train_x = impute(train_x, train_median)
     test_x = impute(test_x, train_median)
 
     split = train_x.shape[0]
-    temp_x = np.append(train_x, test_x, axis = 0)
+    temp_x = np.append(train_x, test_x, axis=0)
 
     # Making polynomial if asked
     if 'degrees' in hp.keys():
-        # Checks if the polynomial has already been calculated
-        #if hp['degrees'] in poly_dict:
-        #    px = poly_dict[hp['degrees']]
-        # Calculates the polynomial and saves it in a dictionary
-        #else:
-
         start = timer()
         poly_x, _ = build_poly(temp_x, hp['degrees'])
-        #poly_dict[hp['degrees']] = px
         end = timer()
         print(f'Poly Time: {end - start:.3f}')
     else:
@@ -98,25 +97,25 @@ def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
 
     to_standardize = True
     if to_standardize:
-        train_mean = np.nanmean(train_x, axis = 0)
-        train_sd = np.nanstd(train_x, axis = 0)
+        train_mean = np.nanmean(train_x, axis=0)
+        train_sd = np.nanstd(train_x, axis=0)
 
         train_x = standardize(train_x, train_mean, train_sd)
         test_x = standardize(test_x, train_mean, train_sd)
 
     to_normalize = False
     if to_normalize:
-        train_max = np.amax(train_x, axis = 0)
-        train_min = np.amin(train_x, axis = 0)
+        train_max = np.amax(train_x, axis=0)
+        train_min = np.amin(train_x, axis=0)
 
         train_x = normalize(train_x, train_max, train_min)
         test_x = normalize(test_x, train_max, train_min)
-    
+    print("Pre-Processing finished...")
     return train_x, train_y, test_x, test_y
 
 
 def cross_validation(train_x, train_y, test_x, test_y, hp, model):
-    """return the loss of the specified model"""
+    """Returns the loss of the specified model"""
 
     # Calculation of losses using the specified model
     # gradient descent:

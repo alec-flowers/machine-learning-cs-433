@@ -1,1 +1,1 @@
-{"degrees": 2, "lambda": 0.3, "model": "ridge"}
+{"degrees": [2], "lambda": [0.3], "model": "ridge"}

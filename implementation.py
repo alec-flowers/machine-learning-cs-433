@@ -100,7 +100,11 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, test_y = None,
     return ws[-1], losses[-1], learning_curve
 
 
+<<<<<<< implementation.py
 def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, test_y = None, test_x = None, error_type = 'MSE'):
+=======
+def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, error_type='MSE'):
+>>>>>>> implementation.py
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -143,19 +147,16 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
 
     W0 = 0
     ws = [initial_w]
-    losses = [compute_mse(y, tx, ws[W0])]
+    losses = [compute_loss(y, tx, ws[W0], error_type)]
     if isinstance(test_y,np.ndarray):
         losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
 
     for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            '''note if we choose a batch_iter(num_batches > 1) then this will not be
-            updating properly because I use n_iter to index into ws and compute the loss 
-            which does not increase if we loop throug this for loop multiple times. Try putting 2 
-            in num_batches you will see what I am saying.'''
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
-            loss = compute_mse(y, tx, ws[-1])
+            loss = compute_loss(y, tx, w, error_type)
+            
             if isinstance(test_y,np.ndarray):
                 loss_test = compute_loss(test_y, test_x, w, error_type)
 

@@ -80,39 +80,6 @@ def gradient_descent_visualization(
     return fig
 
 
-# from training import read_training_set, read_best_hyperparameters
-# from kfold_cv import build_k_indices, cross_validation
-# from helpers import models, model_to_string
-
-
-# def viz_accuracy(k_fold=20, seed=1):
-#     fig, axs = plt.subplots(nrows=2, ncols=1)
-#     y, x, ids_train = read_training_set()
-#     all_accuracies = []
-#     all_losses = []
-#     for model in models:
-#         hyperparameters = read_best_hyperparameters(model)
-#         losses = []
-#         accuracies = []
-#         k_indices = build_k_indices(y, k_fold, seed)
-#         for k in range(k_fold):
-#             loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hyperparameters, model)
-#             losses.append(loss_te)
-#             accuracies.append(acc)
-#         print(f'Model: {model}')
-#         print(f'Hyperparameters: {hyperparameters}  Avg Loss: {np.mean(losses):.5f} Avg Accuracy: {np.mean(accuracies):.4f}')
-#         all_accuracies.append(accuracies)
-#         all_losses.append(losses)
-#     axs[0].boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
-#     axs[1].boxplot(all_losses, labels=[model_to_string[model] for model in models])
-#     axs[0].set_title("Boxplot of the Accuracy")
-#     axs[0].set_ylabel("Accuracy")
-#     axs[1].set_title("Boxplot of the Loss")
-#     axs[1].set_ylabel("Loss")
-#     plt.show()
-
-# viz_accuracy()
-
 def learning_curve_plot(learning_curve):
     fig, ax = plt.subplots(figsize=(11, 6))
     avg_test = []
@@ -138,3 +105,25 @@ def learning_curve_plot(learning_curve):
 
     fig.savefig('./img/Learning_Curve.png')
     plt.show()
+    
+    
+from training import read_training_set, read_best_hyperparameters
+from hyperparams import best_model_selection
+from helpers import models, model_to_string
+
+
+def viz_accuracy(k_folds=2, seed=1):
+    fig, ax = plt.subplots(nrows=1, ncols=1)
+    y, x, ids_train = read_training_set()
+
+    all_accuracies = []
+    for model in models:
+        hyperparameters = read_best_hyperparameters(model)
+        _, _, _, accuracies = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
+        all_accuracies.append(accuracies)
+    ax.boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
+    ax.set_title("Boxplot of the Accuracy")
+    ax.set_ylabel("Accuracy")
+    plt.show()
+
+viz_accuracy()

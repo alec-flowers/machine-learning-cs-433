@@ -2,9 +2,12 @@ from timeit import default_timer as timer
 from proj1_helpers import load_csv_data, save_csv_data
 import numpy as np
 
+
+# Preprocessing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 def standardize(data, mean, std):
     '''
-    Standardize data and subtract mean divide by standard deviation.
+    Standardizes data and subtracts mean divided by standard deviation.
     '''
     data = (data - mean)
     #because column 1 are all 1's the std deviation is 0. Fixing divide by 0 error
@@ -22,7 +25,9 @@ def impute(data, median):
     return data
 
 def normalize(data, max_ , min_):
-
+    """
+    Normalizes data given a maximum and minimum value.
+    """
     data = (data - min_)
     diff = max_ - min_
     data = np.divide(data, diff, out=np.ones((data.shape[0],data.shape[1])), where=diff!=0)
