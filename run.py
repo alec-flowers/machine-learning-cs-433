@@ -1,5 +1,5 @@
 from proj1_helpers import load_csv_data, create_csv_submission
-from costs import predict_labels
+from costs import predict_labels, predict_labels_submission
 from helpers import read_json
 from kfold_cv import build_folds
 from training import read_best_hyperparameters
@@ -61,7 +61,10 @@ def main(args):
     # build polynomial expansion and impute/standardize
     test_x_processed, _, _, _ = build_folds(test_y, test_x, [], -1, hyperparameters, cross_validate=False)
     # do prediction
-    y_pred = predict_labels(weights, test_x_processed)
+    if 'logistic' in model:
+        y_pred = predict_labels_submission(weights, test_x_processed, log=True)
+    else:
+        y_pred = predict_labels_submission(weights, test_x_processed, log=False)
     # save the prediction
     create_csv_submission(ids_test, y_pred, "test_submission.csv")
 

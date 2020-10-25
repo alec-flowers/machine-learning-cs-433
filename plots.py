@@ -101,15 +101,18 @@ def learning_curve_plot(learning_curve, model, hp):
 
     ax.legend(loc='upper right', fontsize = 24)
     ax.set_xlabel('Iters', fontsize = 26)
-    ax.set_ylabel('MSE', fontsize = 26)
+    if 'logistic' in model:
+        ax.set_ylabel('L2 Loss', fontsize = 26)
+    else:
+        ax.set_ylabel('MSE', fontsize = 26)
     ax.set_title('Learning Curve Convergence', fontsize = 32)
     ax.tick_params('both', labelsize = 18)
 
-    # fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
-    # print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
+    fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
+    print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
     plt.show()
-    
-    
+
+
 from training import read_training_set, read_best_hyperparameters
 from hyperparams import best_model_selection
 from helpers import models, model_to_string

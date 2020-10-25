@@ -84,7 +84,12 @@ def sigmoid(t):
     return sigmoid
 
 
-### !!!!
+def predict_labels_submission(weights, data, log=False):
+    y_pred = predict_labels(weights, data, log=log)
+    y_pred[np.where(y_pred == 0)] = -1
+    return y_pred
+
+
 def predict_labels(weights, data, log=False):
     """
     Generates class predictions given weights, and a test data matrix
