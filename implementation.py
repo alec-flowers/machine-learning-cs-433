@@ -33,7 +33,7 @@ def compute_gradient(y, tx, w):
     return gradient
 
 
-def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MSE'):
+def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, test_y = None, test_x = None, error_type='MSE'):
     """Gradient Descent algorithm.
 
     Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -70,26 +70,37 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MS
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
+    if isinstance(test_y,np.ndarray):
+        losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
 
     for iter in range(max_iters):
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
+        if isinstance(test_y,np.ndarray):
+            loss_test = compute_loss(test_y, test_x, w, error_type)
 
         ws.append(w)
         losses.append(loss)
+        if isinstance(test_y,np.ndarray):
+            losses_test.append(loss_test)
+
 
         if iter % int(max_iters/5) == 0:
             print("GD({bi}/{ti}): loss={l:.6f}".format(bi=iter, ti=max_iters - 1, l=losses[-1]))
 
+    if isinstance(test_y,np.ndarray):
+        learning_curve = [[_ for _ in range(max_iters+1)],losses_test, losses]
+    else:
+        learning_curve = None
         # converge criterion
         # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
         #     print('Epsilon Break')
         #     break
-    return ws[-1], losses[-1]
+    return ws[-1], losses[-1], learning_curve
 
 
-def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches):
+def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, test_y = None, test_x = None, error_type = 'MSE'):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -133,6 +144,8 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
     W0 = 0
     ws = [initial_w]
     losses = [compute_mse(y, tx, ws[W0])]
+    if isinstance(test_y,np.ndarray):
+        losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
 
     for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
@@ -143,18 +156,26 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
             loss = compute_mse(y, tx, ws[-1])
+            if isinstance(test_y,np.ndarray):
+                loss_test = compute_loss(test_y, test_x, w, error_type)
 
             ws.append(w)
             losses.append(loss)
+            if isinstance(test_y,np.ndarray):
+                losses_test.append(loss_test)
 
         if iter % int(max_iters/5) == 0:
             print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
+        if isinstance(test_y,np.ndarray):
+            learning_curve = [[_ for _ in range(max_iters+1)],losses_test, losses]
+        else:
+            learning_curve = None
         # converge criterion
         # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
         #     print('Epsilon Break')
         #     break
-    return ws[-1], losses[-1]
+    return ws[-1], losses[-1], learning_curve
 
 
 
@@ -248,10 +269,13 @@ def calculate_gradient_logistic(y, tx, w):
     return gradient
 
 
-def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_size=1, num_batches=1):
+def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_size=1, num_batches=1,
+                            test_y = None, test_x = None):
     # Logistic regression (using Stochastic Gradient Descent):
     losses = []
     ws = [initial_w]
+    if isinstance(test_y,np.ndarray):
+        losses_test = []
 
     for iter in range(max_iters):
 
@@ -261,9 +285,13 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
             gradient = calculate_gradient_logistic(y, tx, w)
             w = w - (gamma) * gradient
             loss = calculate_logistic_loss(y, tx, w)
+            if isinstance(test_y,np.ndarray):
+                loss_test = calculate_logistic_loss(test_y, test_x, w)
 
         losses.append(loss)
         ws.append(w)
+        if isinstance(test_y,np.ndarray):
+            losses_test.append(loss_test)
 
         if iter % int(max_iters/5) == 0:
             print(f"Current iteration={iter}, loss={loss}")
@@ -271,15 +299,24 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
+    
+    if isinstance(test_y,np.ndarray):
+        learning_curve = [[_ for _ in range(max_iters)],losses_test, losses]
+    else:
+        learning_curve = None
+
     print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
-    return ws[-1], losses[-1]
+    return ws[-1], losses[-1], learning_curve
 
 
 # Regularized logistic regression (using SGD):
 def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, lambda_, batch_size = 1,
-                                          num_batches = 1):
+                                          num_batches = 1,test_y = None, test_x = None):
     losses = []
     ws = [initial_w]
+    if isinstance(test_y,np.ndarray):
+        losses_test = []
+
     for iter in range(max_iters):
         # Learning by stochastic gradient descent
         w = ws[-1]
@@ -289,16 +326,26 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamm
             gradient = gradient + lamb
             w = w - gamma * gradient
             loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
+            if isinstance(test_y,np.ndarray):
+                loss_test = calculate_logistic_loss(test_y, test_x, w) + lambda_ * np.squeeze(w.T @ w)
 
         losses.append(loss)
         ws.append(w)
+        if isinstance(test_y,np.ndarray):
+            losses_test.append(loss_test)
 
         if iter % int(max_iters/5) == 0:
             print("Current iteration = {i}, loss = {l}".format(i=iter, l=loss))
 
         # converge criterion
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            break
+        # if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
+        #     break
+
+        if isinstance(test_y,np.ndarray):
+            learning_curve = [[_ for _ in range(max_iters)],losses_test, losses]
+        else:
+            learning_curve = None
+
     #print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
-    return ws[-1], losses[-1]
+    return ws[-1], losses[-1], learning_curve
 

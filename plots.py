@@ -80,35 +80,61 @@ def gradient_descent_visualization(
     return fig
 
 
-from training import read_training_set, read_best_hyperparameters
-from kfold_cv import build_k_indices, cross_validation
-from helpers import models, model_to_string
+# from training import read_training_set, read_best_hyperparameters
+# from kfold_cv import build_k_indices, cross_validation
+# from helpers import models, model_to_string
 
 
-def viz_accuracy(k_fold=20, seed=1):
-    fig, axs = plt.subplots(nrows=2, ncols=1)
-    y, x, ids_train = read_training_set()
-    all_accuracies = []
-    all_losses = []
-    for model in models:
-        hyperparameters = read_best_hyperparameters(model)
-        losses = []
-        accuracies = []
-        k_indices = build_k_indices(y, k_fold, seed)
-        for k in range(k_fold):
-            loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hyperparameters, model)
-            losses.append(loss_te)
-            accuracies.append(acc)
-        print(f'Model: {model}')
-        print(f'Hyperparameters: {hyperparameters}  Avg Loss: {np.mean(losses):.5f} Avg Accuracy: {np.mean(accuracies):.4f}')
-        all_accuracies.append(accuracies)
-        all_losses.append(losses)
-    axs[0].boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
-    axs[1].boxplot(all_losses, labels=[model_to_string[model] for model in models])
-    axs[0].set_title("Boxplot of the Accuracy")
-    axs[0].set_ylabel("Accuracy")
-    axs[1].set_title("Boxplot of the Loss")
-    axs[1].set_ylabel("Loss")
+# def viz_accuracy(k_fold=20, seed=1):
+#     fig, axs = plt.subplots(nrows=2, ncols=1)
+#     y, x, ids_train = read_training_set()
+#     all_accuracies = []
+#     all_losses = []
+#     for model in models:
+#         hyperparameters = read_best_hyperparameters(model)
+#         losses = []
+#         accuracies = []
+#         k_indices = build_k_indices(y, k_fold, seed)
+#         for k in range(k_fold):
+#             loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hyperparameters, model)
+#             losses.append(loss_te)
+#             accuracies.append(acc)
+#         print(f'Model: {model}')
+#         print(f'Hyperparameters: {hyperparameters}  Avg Loss: {np.mean(losses):.5f} Avg Accuracy: {np.mean(accuracies):.4f}')
+#         all_accuracies.append(accuracies)
+#         all_losses.append(losses)
+#     axs[0].boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
+#     axs[1].boxplot(all_losses, labels=[model_to_string[model] for model in models])
+#     axs[0].set_title("Boxplot of the Accuracy")
+#     axs[0].set_ylabel("Accuracy")
+#     axs[1].set_title("Boxplot of the Loss")
+#     axs[1].set_ylabel("Loss")
+#     plt.show()
+
+# viz_accuracy()
+
+def learning_curve_plot(learning_curve):
+    fig, ax = plt.subplots(figsize=(11, 6))
+    avg_test = []
+    avg_train = []
+
+    for fold in learning_curve:
+        iters = fold[0]
+        test = fold[1]
+        train = fold[2]
+        ax.plot(iters, test, color = 'orange',alpha = .5, linewidth = .5, linestyle = '--')
+        ax.plot(iters, train, color = 'b', alpha = .5, linewidth = .5, linestyle = '--')
+
+        avg_test.append(test)
+        avg_train.append(train)
+    
+    ax.plot(iters, np.mean(np.array(avg_test), axis = 0), color = 'orange', linewidth = 1.2, label = 'Avg Test Error')
+    ax.plot(iters, np.mean(np.array(avg_train), axis = 0), color = 'b', linewidth = 1.2, label = 'Avg Train Error')
+
+    ax.legend(loc='upper right')
+    ax.set_xlabel('Iters', fontsize = 16)
+    ax.set_ylabel('MSE', fontsize = 16)
+    ax.set_title('Learning Curve Convergence', fontsize = 18)
+
+    fig.savefig('./img/Learning_Curve.png')
     plt.show()
-
-viz_accuracy()
