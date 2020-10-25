@@ -7,6 +7,7 @@ from helpers import batch_iter
 
 """Gradient Descent"""
 
+
 def compute_gradient(y, tx, w):
     """Compute a gradient for MSE.
 
@@ -70,27 +71,26 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, test_y = None, test_x =
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
-    if isinstance(test_y,np.ndarray):
+    if isinstance(test_y, np.ndarray):
         losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
 
     for iter in range(max_iters):
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
-        if isinstance(test_y,np.ndarray):
+        if isinstance(test_y, np.ndarray):
             loss_test = compute_loss(test_y, test_x, w, error_type)
 
         ws.append(w)
         losses.append(loss)
-        if isinstance(test_y,np.ndarray):
+        if isinstance(test_y, np.ndarray):
             losses_test.append(loss_test)
 
-
-        if iter % int(max_iters/5) == 0:
+        if iter % int(max_iters / 5) == 0:
             print("GD({bi}/{ti}): loss={l:.6f}".format(bi=iter, ti=max_iters - 1, l=losses[-1]))
 
-    if isinstance(test_y,np.ndarray):
-        learning_curve = [[_ for _ in range(max_iters+1)],losses_test, losses]
+    if isinstance(test_y, np.ndarray):
+        learning_curve = [[_ for _ in range(max_iters + 1)], losses_test, losses]
     else:
         learning_curve = None
 
@@ -141,7 +141,7 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, gamma, 
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
-    if isinstance(test_y,np.ndarray):
+    if isinstance(test_y, np.ndarray):
         losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
 
     for iter in range(max_iters):
@@ -149,28 +149,30 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, gamma, 
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
             loss = compute_loss(y, tx, w, error_type)
-            
-            if isinstance(test_y,np.ndarray):
+
+            if isinstance(test_y, np.ndarray):
                 loss_test = compute_loss(test_y, test_x, w, error_type)
 
             ws.append(w)
             losses.append(loss)
-            if isinstance(test_y,np.ndarray):
+            if isinstance(test_y, np.ndarray):
                 losses_test.append(loss_test)
 
-        if iter % int(max_iters/5) == 0:
-            print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
+        if iter % int(max_iters / 5) == 0:
+            print(
+                "SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1],
+                                                                                w0=w[0], w1=w[1]))
 
-        if isinstance(test_y,np.ndarray):
-            learning_curve = [[_ for _ in range(max_iters+1)],losses_test, losses]
+        if isinstance(test_y, np.ndarray):
+            learning_curve = [[_ for _ in range(max_iters + 1)], losses_test, losses]
         else:
             learning_curve = None
 
     return ws[-1], losses[-1], learning_curve
 
 
-
 """ Least squares """
+
 
 def least_squares(y, tx):
     """Least Squares algorithm.
@@ -197,8 +199,8 @@ def least_squares(y, tx):
     return w, loss
 
 
-
 """Ridge regression"""
+
 
 def ridge_regression(y, tx, lambda_):
     """Ridge Regression algorithm.
@@ -235,6 +237,7 @@ def ridge_regression(y, tx, lambda_):
 
 """Logistic regression"""
 
+
 def calculate_gradient_logistic(y, tx, w):
     """Compute a gradient for Logistic Regression loss.
 
@@ -265,7 +268,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, batch_size=1, num_ba
     # Logistic regression (using Stochastic Gradient Descent):
     losses = []
     ws = [initial_w]
-    if isinstance(test_y,np.ndarray):
+    if isinstance(test_y, np.ndarray):
         losses_test = []
 
     for iter in range(max_iters):
@@ -276,15 +279,15 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma, batch_size=1, num_ba
             gradient = calculate_gradient_logistic(y, tx, w)
             w = w - (gamma) * gradient
             loss = calculate_logistic_loss(y, tx, w)
-            if isinstance(test_y,np.ndarray):
+            if isinstance(test_y, np.ndarray):
                 loss_test = calculate_logistic_loss(test_y, test_x, w)
 
         losses.append(loss)
         ws.append(w)
-        if isinstance(test_y,np.ndarray):
+        if isinstance(test_y, np.ndarray):
             losses_test.append(loss_test)
 
-        if iter % int(max_iters/5) == 0:
+        if iter % int(max_iters / 5) == 0:
             print(f"Current iteration={iter}, loss={loss}")
     
     if isinstance(test_y,np.ndarray):
@@ -301,7 +304,7 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, gamma, lambda_,
                                           num_batches = 1,test_y = None, test_x = None):
     losses = []
     ws = [initial_w]
-    if isinstance(test_y,np.ndarray):
+    if isinstance(test_y, np.ndarray):
         losses_test = []
 
     for iter in range(max_iters):
@@ -313,15 +316,15 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, gamma, lambda_,
             gradient = gradient + lamb
             w = w - gamma * gradient
             loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
-            if isinstance(test_y,np.ndarray):
+            if isinstance(test_y, np.ndarray):
                 loss_test = calculate_logistic_loss(test_y, test_x, w) + lambda_ * np.squeeze(w.T @ w)
 
         losses.append(loss)
         ws.append(w)
-        if isinstance(test_y,np.ndarray):
+        if isinstance(test_y, np.ndarray):
             losses_test.append(loss_test)
 
-        if iter % int(max_iters/5) == 0:
+        if iter % int(max_iters / 5) == 0:
             print("Current iteration = {i}, loss = {l}".format(i=iter, l=loss))
 
         if isinstance(test_y,np.ndarray):
@@ -329,6 +332,5 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, gamma, lambda_,
         else:
             learning_curve = None
 
-    #print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+    # print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
     return ws[-1], losses[-1], learning_curve
-
