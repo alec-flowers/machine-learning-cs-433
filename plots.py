@@ -105,9 +105,9 @@ def learning_curve_plot(learning_curve, model, hp):
     ax.set_title('Learning Curve Convergence', fontsize = 32)
     ax.tick_params('both', labelsize = 18)
 
+    # fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
+    # print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
     plt.show()
-    #fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
-    #print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
     
     
 from training import read_training_set, read_best_hyperparameters
