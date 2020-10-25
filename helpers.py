@@ -7,7 +7,7 @@ import json
 models = ["gd", "sgd", "ridge", "least_squares", "logistic", "regularized_logistic"]
 model_to_string = {
     "gd": "GD", "sgd": "SGD", "ridge": "RIDGE", "least_squares": "LS", "logistic": "LR", "regularized_logistic": "LRL"
-}
+}  ###??¿¿
 
 
 def split_data(x, y, ratio, seed=1):
@@ -133,13 +133,13 @@ def load_data(sub_sample=True, add_outlier=False):
     return height, weight, gender
 
 
-def standardize(x):
-    """Standardizes the original data set."""
-    mean_x = np.mean(x)
-    x = x - mean_x
-    std_x = np.std(x)
-    x = x / std_x
-    return x, mean_x, std_x
+# def standardize(x):
+#     """Standardizes the original data set."""
+#     mean_x = np.mean(x)
+#     x = x - mean_x
+#     std_x = np.std(x)
+#     x = x / std_x
+#     return x, mean_x, std_x
 
 ###!!!!????
 # def build_model_data(x, y):

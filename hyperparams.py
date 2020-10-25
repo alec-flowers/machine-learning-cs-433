@@ -26,16 +26,14 @@ def find_hyperparams(model):
     'least_squares', 'logistic', 'regularized_logistic']) and saves them into a .json file.
     """
 
-    print(f"Loading data...")
     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-    print(f"Starting selection of best performing hyperparameters of {model}...")
+    print(f"Starting selection of best performing hyperparameters for {model}...")
     hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     print("Finished...")
     print(f'Best performing hyperparameters: {hp_star}  , Loss: {loss_star:.5f} , Weights: {weights}')
     print(f"Saving best performing hyperparameters as "f"best_hyperparams_{model}.json...")
     save_hyperparams(model, hp_star)
-
-
+    print("Finished...")
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
@@ -120,7 +118,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     hp_star = {key: [value] for key, value in hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
     w = weights[min_acc_idx]
 
-    return hp_star, acc_star, w, accuracy
+    return hp_star, acc_star, w
 
 
 def save_hyperparams(model, hp_star):
@@ -129,17 +127,12 @@ def save_hyperparams(model, hp_star):
     write_json(filename, hp_star)
 
 
-def find_hyperparams(model):
-    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-    hp_star, loss_star, weights, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    save_hyperparams(model, hp_star)
-
 
 def read_hyperparam_input(model):
     """
     Reads the input collection of hyperparameters for a given model and loads the training dataset.
     """
-
+    print(f"Loading data...")
     DATA_FOLDER = 'Data/'
     TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'

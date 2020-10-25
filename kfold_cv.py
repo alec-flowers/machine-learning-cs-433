@@ -1,8 +1,8 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
-    logistic_regression, regularized_logistic_regression
+from implementation import ridge_regression, least_squares_GD, least_squares_SGD, least_squares, \
+    logistic_regression, reg_logistic_regression
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
 from data_process import impute, normalize, standardize
@@ -121,11 +121,10 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
     # gradient descent:
     if model == 'gd':
         initial_w = [0 for _ in range(train_x.shape[1])]
-        epsilon = hp['epsilon']
         gamma = hp['gamma']
         max_iters = hp['max_iters']
 
-        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, epsilon, gamma)
+        weights, loss_tr = least_squares_GD(train_y, train_x, initial_w, max_iters, gamma)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
@@ -134,12 +133,9 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         max_iters = hp['max_iters']
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
-        epsilon = hp['epsilon']
         gamma = hp['gamma']
 
-        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters, batch_size, epsilon,
-                                                       gamma,
-                                                       num_batches)
+        weights, loss_tr = least_squares_SGD(train_y, train_x, initial_w, max_iters, gamma, batch_size, num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
@@ -159,27 +155,23 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
     elif model == 'logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
-        threshold = hp['threshold']
         gamma = hp['gamma']
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
-                                               num_batches)
+        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, gamma, batch_size, num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
-        threshold = hp['threshold']
         gamma = hp['gamma']
         lambda_ = hp['lambda_']
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size, num_batches)
+        weights, loss_tr = reg_logistic_regression(train_y, train_x, lambda_, initial_w, max_iters, gamma, batch_size)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     acc = calc_accuracy(test_y, test_x, weights, model)

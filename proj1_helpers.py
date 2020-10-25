@@ -25,9 +25,11 @@ def load_csv_data(data_path, skip_header = 1, sub_sample=False):
 
     return yb, input_data, ids
 
+
 def save_csv_data(data_path, data):
     print('---Saving Data---')
     np.savetxt(data_path, data, delimiter = ",", header = 'Take some space')
+
 
 def create_csv_submission(ids, y_pred, name):
     """

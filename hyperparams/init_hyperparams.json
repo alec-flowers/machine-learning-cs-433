@@ -1,8 +1,5 @@
 {
   "sgd": {
-    "epsilon": [
-      1e15
-    ],
     "max_iters":[
       1000
     ],
@@ -22,9 +19,6 @@
     ]
   },
   "gd": {
-    "epsilon": [
-      1e-10
-    ],
     "max_iters":[
       500
     ],
@@ -49,15 +43,12 @@
       2
     ],
     "lambda": [
-      0.3
+      0.4
     ]
   },
   "logistic": {
     "max_iters": [
       2500
-    ],
-    "threshold": [
-      1e-9
     ],
     "gamma": [
       1e-6,
@@ -94,9 +85,6 @@
     ],
     "lambda_": [
       0.1
-    ],
-    "threshold": [
-      1e-8
     ]
   }
 }

@@ -33,7 +33,7 @@ def compute_gradient(y, tx, w):
     return gradient
 
 
-def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MSE'):
+def least_squares_GD(y, tx, initial_w, max_iters, gamma, error_type='MSE'):
     """Gradient Descent algorithm.
 
     Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -49,11 +49,8 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MS
     initial_w : ndarray of shape (n_weights,)
         Weight vector
 
-    epsilon: float
-        do gradient descent until residual is smaller than epsilon
-
     gamma : float
-        learing rate
+        learning rate
 
     Returns
     ----------
@@ -82,14 +79,11 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MS
         if iter % int(max_iters/5) == 0:
             print("GD({bi}/{ti}): loss={l:.6f}".format(bi=iter, ti=max_iters - 1, l=losses[-1]))
 
-        # converge criterion
-        # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
-        #     print('Epsilon Break')
-        #     break
     return ws[-1], losses[-1]
 
 
-def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, error_type='MSE'):
+
+def least_squares_SGD(y, tx, initial_w, max_iters, gamma, batch_size=1, num_batches=1, error_type='MSE'):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -106,17 +100,17 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
     initial_w : ndarray of shape (n_weights,)
         Weight vector
 
-    batch_size : int
-        size of  the batches
-
-    epsilon: float
-        do gradient descent until residual is smaller than epsilon
-
     gamma : float
-        learing rate
+        learning rate
+
+    batch_size : int
+        size of  the batches (default = 1)
 
     num_batches: int
-        Number of mini batches for one iteration
+        Number of mini batches for one iteration (default = 1)
+
+    error_type : string selecting ['MSE', 'MAE', 'RMSE']
+        default = 'MSE'
 
     Returns
     ----------
@@ -146,10 +140,6 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
         if iter % int(max_iters/5) == 0:
             print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
-        # converge criterion
-        # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
-        #     print('Epsilon Break')
-        #     break
     return ws[-1], losses[-1]
 
 
@@ -244,7 +234,7 @@ def calculate_gradient_logistic(y, tx, w):
     return gradient
 
 
-def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_size=1, num_batches=1):
+def logistic_regression(y, tx, initial_w, max_iters, gamma, batch_size=1, num_batches=1):
     # Logistic regression (using Stochastic Gradient Descent):
     losses = []
     ws = [initial_w]
@@ -254,9 +244,9 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
         # Learning by stochastic gradient descent
         w = ws[-1]
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            gradient = calculate_gradient_logistic(y, tx, w)
-            w = w - (gamma) * gradient
             loss = calculate_logistic_loss(y, tx, w)
+            gradient = calculate_gradient_logistic(y, tx, w)
+            w = w - gamma * gradient
 
         losses.append(loss)
         ws.append(w)
@@ -264,37 +254,29 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
         if iter % int(max_iters/5) == 0:
             print(f"Current iteration={iter}, loss={loss}")
 
-        # converge criterion
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            break
     print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+
     return ws[-1], losses[-1]
 
 
 # Regularized logistic regression (using SGD):
-def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, lambda_, batch_size = 1,
-                                          num_batches = 1):
+def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma, batch_size=1, num_batches=1):
     losses = []
     ws = [initial_w]
     for iter in range(max_iters):
         # Learning by stochastic gradient descent
-        w = ws[-1]
+        w = np.array(ws[-1])
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            gradient = calculate_gradient_logistic(y, tx, w)
-            lamb = 2 * lambda_ * np.array(w)
-            gradient = gradient + lamb
-            w = w - gamma * gradient
             loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
+            gradient = calculate_gradient_logistic(y, tx, w) + 2 * lambda_ * w
+            w = w - gamma * gradient
+
 
         losses.append(loss)
         ws.append(w)
 
         if iter % int(max_iters/5) == 0:
             print("Current iteration = {i}, loss = {l}".format(i=iter, l=loss))
-
-        # converge criterion
-        if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
-            break
 
     return ws[-1], losses[-1]
 

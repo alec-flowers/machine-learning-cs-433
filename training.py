@@ -63,9 +63,9 @@ def train(model, seed=1):
 
     WEIGHTS_DIR = "hyperparams"
     WEIGHTS_FILENAME = f"weights_{model}.json"
-    print(f"Saving weights and corresponding hyperparameters to {path.join(WEIGHTS_DIR, WEIGHTS_FILENAME)}")
+    print(f"Saving weights and corresponding hyperparameters to {path.join(WEIGHTS_DIR, WEIGHTS_FILENAME)}...")
     write_json(path.join(WEIGHTS_DIR, WEIGHTS_FILENAME), hyperparameters)
-
+    print("Finished...")
 
 def read_training_set():
     """
