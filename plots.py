@@ -80,6 +80,33 @@ def gradient_descent_visualization(
     return fig
 
 
+def learning_curve_plot(learning_curve):
+    fig, ax = plt.subplots(figsize=(11, 6))
+    avg_test = []
+    avg_train = []
+
+    for fold in learning_curve:
+        iters = fold[0]
+        test = fold[1]
+        train = fold[2]
+        ax.plot(iters, test, color = 'orange',alpha = .5, linewidth = .5, linestyle = '--')
+        ax.plot(iters, train, color = 'b', alpha = .5, linewidth = .5, linestyle = '--')
+
+        avg_test.append(test)
+        avg_train.append(train)
+    
+    ax.plot(iters, np.mean(np.array(avg_test), axis = 0), color = 'orange', linewidth = 1.2, label = 'Avg Test Error')
+    ax.plot(iters, np.mean(np.array(avg_train), axis = 0), color = 'b', linewidth = 1.2, label = 'Avg Train Error')
+
+    ax.legend(loc='upper right')
+    ax.set_xlabel('Iters', fontsize = 16)
+    ax.set_ylabel('MSE', fontsize = 16)
+    ax.set_title('Learning Curve Convergence', fontsize = 18)
+
+    fig.savefig('./img/Learning_Curve.png')
+    plt.show()
+    
+    
 from training import read_training_set, read_best_hyperparameters
 from hyperparams import best_model_selection
 from helpers import models, model_to_string

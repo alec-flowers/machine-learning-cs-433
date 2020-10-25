@@ -7,6 +7,7 @@ from os import path
 from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
 from helpers import write_json, read_json
+from plots import learning_curve_plot
 
 # Hyperparameters selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -89,6 +90,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         k_indices = build_k_indices(y, k_fold, seed)
         loss_list = []
         acc_list = []
+        learning_curve_list = []
 
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
@@ -102,13 +104,16 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                 train_x, train_y, test_x, test_y = build_folds(y, x, k_indices, k, hp)
                 poly_dict[k] = {}
                 poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
-            loss_tr, loss_te, acc, weight = cross_validation(train_x, train_y, test_x, test_y, hp, model)
+            loss_tr, loss_te, acc, weight, learning_curve = cross_validation(train_x, train_y, test_x, test_y, hp, model)
             loss_list.append(loss_te)
             acc_list.append(acc)
+            learning_curve_list.append(learning_curve)
         loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
         accuracy.append(np.mean(acc_list))
         weights.append(weight)
         end = timer()
+        if learning_curve_list[0]:
+            learning_curve_plot(learning_curve_list)
 
         print(
             f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {(end - start):.3f}')

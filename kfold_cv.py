@@ -119,13 +119,15 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
 
     # Calculation of losses using the specified model
     # gradient descent:
+    learning_curve = None
     if model == 'gd':
         initial_w = [0 for _ in range(train_x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
         max_iters = hp['max_iters']
 
-        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, epsilon, gamma)
+        #if you don't want plots remove test_y and test_x
+        weights, loss_tr, learning_curve = gradient_descent(train_y, train_x, initial_w, max_iters, epsilon, gamma, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
@@ -137,9 +139,9 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         epsilon = hp['epsilon']
         gamma = hp['gamma']
 
-        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters, batch_size, epsilon,
-                                                       gamma,
-                                                       num_batches)
+        #if you don't want plots remove test_y and test_x
+        weights, loss_tr, learning_curve = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,batch_size, epsilon, gamma,
+                                                       num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
@@ -164,8 +166,9 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        weights, loss_tr = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
-                                               num_batches)
+        #if you don't want plots remove test_y and test_x
+        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
+                                               num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # regularized logistic regression: TODO
@@ -178,10 +181,11 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size, num_batches)
+        #if you don't want plots remove test_y and test_x
+        weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
+                                                           lambda_, batch_size, num_batches,test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     acc = calc_accuracy(test_y, test_x, weights, model)
 
-    return loss_tr, loss_te, acc, weights
+    return loss_tr, loss_te, acc, weights, learning_curve
