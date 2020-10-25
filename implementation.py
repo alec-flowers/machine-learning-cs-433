@@ -100,11 +100,7 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, test_y = None,
     return ws[-1], losses[-1], learning_curve
 
 
-<<<<<<< implementation.py
 def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, test_y = None, test_x = None, error_type = 'MSE'):
-=======
-def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, error_type='MSE'):
->>>>>>> implementation.py
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
