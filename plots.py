@@ -85,8 +85,8 @@ from hyperparams import best_model_selection
 from helpers import models, model_to_string
 
 
-def viz_accuracy(k_folds=20, seed=1):
-    fig, axs = plt.subplots(nrows=1, ncols=1)
+def viz_accuracy(k_folds=2, seed=1):
+    fig, ax = plt.subplots(nrows=1, ncols=1)
     y, x, ids_train = read_training_set()
 
     all_accuracies = []
@@ -94,9 +94,9 @@ def viz_accuracy(k_folds=20, seed=1):
         hyperparameters = read_best_hyperparameters(model)
         _, _, _, accuracies = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
         all_accuracies.append(accuracies)
-    axs[0].boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
-    axs[0].set_title("Boxplot of the Accuracy")
-    axs[0].set_ylabel("Accuracy")
+    ax.boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
+    ax.set_title("Boxplot of the Accuracy")
+    ax.set_ylabel("Accuracy")
     plt.show()
 
 viz_accuracy()

@@ -5,7 +5,7 @@ import argparse
 from os import path
 
 from proj1_helpers import load_csv_data
-from kfold_cv import ParameterGrid, cross_validation, build_k_indices, cv_kfold
+from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
 from helpers import write_json, read_json
 
 
@@ -67,7 +67,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                 test_x = poly_dict[k][hp['degrees']][2]
                 test_y = poly_dict[k][hp['degrees']][3]
             else:
-                train_x, train_y, test_x, test_y = cv_kfold(y, x, k_indices, k, hp)
+                train_x, train_y, test_x, test_y = build_folds(y, x, k_indices, k, hp)
                 poly_dict[k] = {}
                 poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
             loss_tr, loss_te, acc, weight = cross_validation(train_x, train_y, test_x, test_y, hp, model)
@@ -87,20 +87,21 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     min_acc_idx = np.argmax(accuracy)  # This is the index of the best accuracy
     acc_star = accuracy[min_acc_idx]
     hp_star = list(hyperparam)[min_acc_idx]  # corresponding hyperparameters
+    hp_star = {key: [value] for key, value in hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
     w = weights[min_acc_idx]  # corresponding weights
 
-    return hp_star, acc_star, w
+    return hp_star, acc_star, w, accuracy
 
 
 def save_hyperparams(model, hp_star):
     filename = f"hyperparams/best_hyperparams_{model}.json"
-    hp_star['model'] = model
+    hp_star['model'] = [model]
     write_json(filename, hp_star)
 
 
 def find_hyperparams(model):
     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    hp_star, loss_star, weights, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     save_hyperparams(model, hp_star)
 
 
