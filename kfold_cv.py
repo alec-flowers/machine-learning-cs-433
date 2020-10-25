@@ -122,12 +122,11 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
     learning_curve = None
     if model == 'gd':
         initial_w = [0 for _ in range(train_x.shape[1])]
-        epsilon = hp['epsilon']
         gamma = hp['gamma']
         max_iters = hp['max_iters']
 
         #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = gradient_descent(train_y, train_x, initial_w, max_iters, epsilon, gamma, test_y, test_x)
+        weights, loss_tr, learning_curve = gradient_descent(train_y, train_x, initial_w, max_iters, gamma, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
@@ -136,11 +135,10 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         max_iters = hp['max_iters']
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
-        epsilon = hp['epsilon']
         gamma = hp['gamma']
 
         #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,batch_size, epsilon, gamma,
+        weights, loss_tr, learning_curve = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,batch_size, gamma,
                                                        num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
@@ -161,13 +159,12 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
     elif model == 'logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
-        threshold = hp['threshold']
         gamma = hp['gamma']
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
         #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma, batch_size,
+        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, gamma, batch_size,
                                                num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
@@ -175,14 +172,13 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
     elif model == 'regularized_logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
-        threshold = hp['threshold']
         gamma = hp['gamma']
         lambda_ = hp['lambda_']
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
         #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
+        weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, gamma,
                                                            lambda_, batch_size, num_batches,test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 

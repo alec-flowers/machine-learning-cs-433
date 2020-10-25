@@ -99,15 +99,17 @@ def learning_curve_plot(learning_curve, model, hp):
     ax.plot(iters, np.mean(np.array(avg_test), axis=0), color='orange', linewidth=1.2, label='Avg Test Error')
     ax.plot(iters, np.mean(np.array(avg_train), axis=0), color='b', linewidth=1.2, label='Avg Train Error')
 
-    ax.legend(loc='upper right')
-    ax.set_xlabel('Iters', fontsize=16)
-    ax.set_ylabel('MSE', fontsize=16)
-    ax.set_title('Learning Curve Convergence', fontsize=18)
+    ax.legend(loc='upper right', fontsize = 24)
+    ax.set_xlabel('Iters', fontsize = 26)
+    ax.set_ylabel('MSE', fontsize = 26)
+    ax.set_title('Learning Curve Convergence', fontsize = 32)
+    ax.tick_params('both', labelsize = 18)
 
-    fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
-    print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
-
-
+    plt.show()
+    #fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
+    #print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
+    
+    
 from training import read_training_set, read_best_hyperparameters
 from hyperparams import best_model_selection
 from helpers import models, model_to_string
