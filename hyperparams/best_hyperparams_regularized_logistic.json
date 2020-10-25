@@ -1,1 +1,1 @@
-{"batch_size": 1, "degrees": 2, "gamma": 1e-05, "lambda_": 0.1, "max_iters": 1200, "num_batches": 1, "threshold": 1e-08, "model": "regularized_logistic"}
+{"batch_size": [1], "degrees": [2], "gamma": [1e-05], "lambda_": [0.1], "max_iters": [1200], "num_batches": [1], "threshold": [1e-08], "model": ["regularized_logistic"]}
