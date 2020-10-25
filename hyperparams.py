@@ -7,7 +7,6 @@ from os import path
 from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
 from helpers import write_json, read_json
-from plots import learning_curve_plot
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
@@ -83,9 +82,6 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         accuracy.append(np.mean(acc_list))
         weights.append(weight)
         end = timer()
-        if learning_curve_list[0]:
-            learning_curve_plot(learning_curve_list, model, hp)
-
         print(
             f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {(end - start):.3f}')
 
@@ -97,19 +93,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
     w = weights[min_acc_idx]
 
-    return hp_star, acc_star, w, accuracy
-
-
-# def save_hyperparams(model, hp_star):
-#     filename = f"hyperparams/best_hyperparams_{model}.json"
-#     hp_star['model'] = [model]
-#     write_json(filename, hp_star)
-#
-#
-# def find_hyperparams(model):
-#     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-#     hp_star, loss_star, weights, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-#     save_hyperparams(model, hp_star)
+    return hp_star, acc_star, w, accuracy, learning_curve_list
 
 
 def read_hyperparam_input(model):
@@ -147,7 +131,7 @@ def find_hyperparams(model):
     print(f"Loading data...")
     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
     print(f"Starting selection of best performing hyperparameters of {model}...")
-    hp_star, loss_star, weights, accuracy = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    hp_star, loss_star, weights, accuracy, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     print("Finished...")
     print(f'Best performing hyperparameters: {hp_star}  , Loss: {loss_star:.5f} , Weights: {weights}')
     print(f"Saving best performing hyperparameters as "f"best_hyperparams_{model}.json...")

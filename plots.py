@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from grid_search import get_best_parameters
+import argparse
 
 
 def prediction(w0, w1, mean_x, std_x):
@@ -89,42 +90,61 @@ def learning_curve_plot(learning_curve, model, hp):
         iters = fold[0]
         test = fold[1]
         train = fold[2]
-        ax.plot(iters, test, color = 'orange',alpha = .5, linewidth = .5, linestyle = '--')
-        ax.plot(iters, train, color = 'b', alpha = .5, linewidth = .5, linestyle = '--')
+        ax.plot(iters, test, color='orange', alpha=.5, linewidth=.5, linestyle='--')
+        ax.plot(iters, train, color='b', alpha=.5, linewidth=.5, linestyle='--')
 
         avg_test.append(test)
         avg_train.append(train)
-    
-    ax.plot(iters, np.mean(np.array(avg_test), axis = 0), color = 'orange', linewidth = 1.2, label = 'Avg Test Error')
-    ax.plot(iters, np.mean(np.array(avg_train), axis = 0), color = 'b', linewidth = 1.2, label = 'Avg Train Error')
+
+    ax.plot(iters, np.mean(np.array(avg_test), axis=0), color='orange', linewidth=1.2, label='Avg Test Error')
+    ax.plot(iters, np.mean(np.array(avg_train), axis=0), color='b', linewidth=1.2, label='Avg Train Error')
 
     ax.legend(loc='upper right')
-    ax.set_xlabel('Iters', fontsize = 16)
-    ax.set_ylabel('MSE', fontsize = 16)
-    ax.set_title('Learning Curve Convergence', fontsize = 18)
+    ax.set_xlabel('Iters', fontsize=16)
+    ax.set_ylabel('MSE', fontsize=16)
+    ax.set_title('Learning Curve Convergence', fontsize=18)
 
-    #fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
-    #print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
-    
-    
+    fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
+    print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
+
+
 from training import read_training_set, read_best_hyperparameters
 from hyperparams import best_model_selection
 from helpers import models, model_to_string
 
 
-def viz_accuracy(k_folds=2, seed=1):
+def viz_accuracy(k_folds=4, seed=1):
     fig, ax = plt.subplots(nrows=1, ncols=1)
     y, x, ids_train = read_training_set()
 
     all_accuracies = []
     for model in models:
         hyperparameters = read_best_hyperparameters(model)
-        _, _, _, accuracies = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
+        _, _, _, accuracies, _ = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
         all_accuracies.append(accuracies)
     ax.boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
     ax.set_title("Boxplot of the Accuracy")
     ax.set_ylabel("Accuracy")
     plt.show()
 
+
+def viz_loss(model, k_folds=4, seed=1):
+    y, x, ids_train = read_training_set()
+    hyperparameters = read_best_hyperparameters(model)
+    _, _, _, _, learning_curves_list = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
+    learning_curve_plot(learning_curves_list, model, hyperparameters)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="CLI for the plot.py which is used for plotting.")
+    parser.add_argument('-p', '--plot', type=str, help='Which plot to generate.', required=True,
+                        choices=['box', 'gd', 'sgd', 'least_squares', 'ridge', 'logistic', 'regularized_logistic'])
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    viz_accuracy()
+    args = parse_args()
+    if args.plot == 'box':
+        viz_accuracy()
+    else:
+        viz_loss(args.plot)
