@@ -17,7 +17,7 @@ def standardize(data, mean, std):
 
 def impute(data, median):
     '''
-    Imputes the -999 values with either the mean or median of the column.
+    Imputes the -999 values with the median of the column.
     '''
     inds = np.where(np.isnan(data))
     data[inds] = np.take(median, inds[1])

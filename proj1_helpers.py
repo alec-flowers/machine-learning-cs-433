@@ -12,8 +12,8 @@ def load_csv_data(data_path, skip_header = 1, sub_sample=False):
 
     #column 4 stays delete (5, 6, 12, 26, 27, 28)
     #column 9 stays delete (21, 29)
-    #x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
-
+    input_data = np.delete(input_data,[12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],axis = 1)
+    print(input_data.shape[1])
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
     yb[np.where(y=='b')] = 0
