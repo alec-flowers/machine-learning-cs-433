@@ -39,8 +39,6 @@ def main():
     #yb_data_test, input_data_test, ids_test = load_csv_data("Data/test.csv")
     x = input_data_train
 
-    #column 4 stays delete (5, 6, 12, 26, 27, 28)
-    #column 9 stays delete (21, 29)
     x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
 
     data = np.c_[ids, y , x]

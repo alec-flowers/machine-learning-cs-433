@@ -10,6 +10,8 @@ def load_csv_data(data_path, skip_header = 1, sub_sample=False):
     ids = x[:, 0].astype(np.int)
     input_data = x[:, 2:]
 
+    #column 4 stays delete (5, 6, 12, 26, 27, 28)
+    #column 9 stays delete (21, 29)
     #x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
 
     # convert class labels from strings to binary (-1,1)
