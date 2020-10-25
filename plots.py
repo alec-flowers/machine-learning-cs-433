@@ -126,4 +126,5 @@ def viz_accuracy(k_folds=2, seed=1):
     ax.set_ylabel("Accuracy")
     plt.show()
 
-viz_accuracy()
+if __name__ == "__main__":
+    viz_accuracy()
