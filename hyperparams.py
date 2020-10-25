@@ -131,9 +131,9 @@ def find_hyperparams(model):
     print(f"Loading data...")
     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
     print(f"Starting selection of best performing hyperparameters of {model}...")
-    hp_star, loss_star, weights, accuracy, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    hp_star, acc_star, weights, accuracy, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     print("Finished...")
-    print(f'Best performing hyperparameters: {hp_star}  , Loss: {loss_star:.5f} , Weights: {weights}')
+    print(f'Best performing hyperparameters: {hp_star}  , Accuracy: {acc_star:.5f} , Weights: {weights}')
     print(f"Saving best performing hyperparameters as "f"best_hyperparams_{model}.json...")
     save_hyperparams(model, hp_star)
 
