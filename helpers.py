@@ -12,12 +12,34 @@ model_to_string = {
 
 def split_data(x, y, ratio, seed=1):
     """
-    split the dataset based on the split ratio. If ratio is 0.8
-    you will have 80% of your data set dedicated to training
-    and the rest dedicated to testing
-    return: x training split, y training split, x test split, y test split
+    Splits the dataset based on the split ratio.
+
+    Parameters
+    ----------
+    x : ndarray of shape (n_samples, n_features)
+        Dataset
+
+    y : ndarray of shape (n_samples,)
+        Array of labels
+
+    ratio : np.float64
+        Data will be splitted according to this ratio, where this value corresponds to training
+
+    Returns
+    ----------
+    x2_train : ndarray
+        Data subset dedicated to training
+
+    y2_train : ndarray
+        Labels corresponding to the data subset dedicated to training
+
+    x2_test : ndarray
+        Data subset dedicated to test
+
+    y2_test : ndarray
+        Labels correspondig to the data subset dedicated to test
     """
-    # set seed
+
     np.random.seed(seed)
     # concatinate x and y into one array
     x_y_concat = np.c_[x.reshape(len(x), -1), y.reshape(len(y), -1)]
@@ -36,7 +58,9 @@ def split_data(x, y, ratio, seed=1):
 
 
 def build_poly(x, degree):
-    """Polynomial basis functions for multivariate inputs
+    """
+    Polynomial basis functions for multivariate inputs
+
     Parameters
 	----------
 	x : ndarray of shape (n_rows, n_col)
@@ -81,7 +105,9 @@ def build_poly(x, degree):
 
 
 def load_data(sub_sample=True, add_outlier=False):
-    """Load data and convert it to the metrics system."""
+    """
+    Loads data and converts it to the metrics system.
+    """
     path_dataset = "./Data/height_weight_genders.csv"
     data = np.genfromtxt(
         path_dataset, delimiter=",", skip_header=1, usecols=[1, 2])
@@ -108,24 +134,24 @@ def load_data(sub_sample=True, add_outlier=False):
 
 
 def standardize(x):
-    """Standardize the original data set."""
+    """Standardizes the original data set."""
     mean_x = np.mean(x)
     x = x - mean_x
     std_x = np.std(x)
     x = x / std_x
     return x, mean_x, std_x
 
-
-def build_model_data(x, y):
-    """Form (y,tX) to get regression data in matrix form."""
-    num_samples = len(y)
-    tx = np.c_[np.ones(num_samples), x]
-    return y, tx
+###!!!!????
+# def build_model_data(x, y):
+#     """Forms (y,tX) to get regression data in matrix form."""
+#     num_samples = len(y)
+#     tx = np.c_[np.ones(num_samples), x]
+#     return y, tx
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """
-    Generate a minibatch iterator for a dataset.
+    Generates a minibatch iterator for a dataset.
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
     Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
     Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
