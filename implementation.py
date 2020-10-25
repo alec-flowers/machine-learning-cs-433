@@ -3,7 +3,6 @@ import numpy as np
 from costs import *
 from helpers import batch_iter
 
-
 # Machine Learning Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 """Gradient Descent"""
@@ -34,7 +33,7 @@ def compute_gradient(y, tx, w):
     return gradient
 
 
-def gradient_descent(y, tx, initial_w, epsilon, gamma, error_type='MSE'):
+def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MSE'):
     """Gradient Descent algorithm.
 
     Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -71,25 +70,26 @@ def gradient_descent(y, tx, initial_w, epsilon, gamma, error_type='MSE'):
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
-    residual = 1e100
-    i = 0
 
-    while residual > epsilon or i < 1000:
+    for iter in range(max_iters):
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
 
         ws.append(w)
         losses.append(loss)
-        residual = abs(losses[-1] - losses[-2])
-        i += 1
 
-        #print("GD({bi}/{ti}): loss={l:.6f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1]))
+        if iter % int(max_iters/5) == 0:
+            print("GD({bi}/{ti}): loss={l:.6f}".format(bi=iter, ti=max_iters - 1, l=losses[-1]))
 
+        # converge criterion
+        # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
+        #     print('Epsilon Break')
+        #     break
     return ws[-1], losses[-1]
 
 
-def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, num_batches):
+def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -133,11 +133,8 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
     W0 = 0
     ws = [initial_w]
     losses = [compute_mse(y, tx, ws[W0])]
-    residual = 1e100
-    i = 0
 
-    while residual > epsilon or i < 1000:
-
+    for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             '''note if we choose a batch_iter(num_batches > 1) then this will not be
             updating properly because I use n_iter to index into ws and compute the loss 
@@ -149,11 +146,14 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, epsilon, gamma, nu
 
             ws.append(w)
             losses.append(loss)
-        residual = abs(losses[-1] - losses[-2])
-        i += 1
 
-            #print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=n_iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
+        if iter % int(max_iters/5) == 0:
+            print("SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1], w0=w[0], w1=w[1]))
 
+        # converge criterion
+        # if len(losses) > 2 and np.abs(losses[-1] - losses[-2]) < epsilon:
+        #     print('Epsilon Break')
+        #     break
     return ws[-1], losses[-1]
 
 
@@ -252,20 +252,21 @@ def logistic_regression(y, tx, initial_w, max_iters, threshold, gamma, batch_siz
     # Logistic regression (using Stochastic Gradient Descent):
     losses = []
     ws = [initial_w]
+
     for iter in range(max_iters):
 
         # Learning by stochastic gradient descent
         w = ws[-1]
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             gradient = calculate_gradient_logistic(y, tx, w)
-            w = w - gamma * gradient
+            w = w - (gamma) * gradient
             loss = calculate_logistic_loss(y, tx, w)
 
         losses.append(loss)
         ws.append(w)
 
-        if iter % 100 == 0:
-            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+        if iter % int(max_iters/5) == 0:
+            print(f"Current iteration={iter}, loss={loss}")
 
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
@@ -292,12 +293,12 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamm
         losses.append(loss)
         ws.append(w)
 
-        if iter % 100 == 0:
-            print("Current iteration={i}, loss={l}".format(i=iter, l=loss))
+        if iter % int(max_iters/5) == 0:
+            print("Current iteration = {i}, loss = {l}".format(i=iter, l=loss))
 
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-    print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+    #print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
     return ws[-1], losses[-1]
 

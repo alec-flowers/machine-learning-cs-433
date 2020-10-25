@@ -96,12 +96,12 @@ def find_hyperparams(model):
 
 def read_hyperparam_input(model):
     DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = path.join(DATA_FOLDER, "p_train.csv")
+    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
     hyperparameters = read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
     end = timer()
     print(f'Data Loaded - Time: {end - start:.3f}\n')

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Functions used to compute the loss."""
 import numpy as np
-from proj1_helpers import predict_labels
 
 
 def compute_error(y, tx, w):
@@ -77,16 +76,31 @@ def compute_loss(y, tx, w, error_fn='MSE'):
         raise NotImplementedError('Did not match a loss function')
     return error
 
-
-def calc_accuracy(y_actual, tx, w):
-    y_pred = predict_labels(w, tx)
-    correct = np.sum(y_pred == y_actual)
-    return correct / len(y_actual)
-
 def sigmoid(t):
     """apply the sigmoid function on t."""
     sigmoid = 1 / (1 + np.exp(-t))
     return sigmoid
+
+def predict_labels(weights, data, log = False):
+    """Generates class predictions given weights, and a test data matrix"""
+    if log:
+        y_pred = sigmoid(np.dot(data, weights))
+    else:
+        y_pred = np.dot(data, weights)
+
+    y_pred[np.where(y_pred <= .5)] = 0
+    y_pred[np.where(y_pred > .5)] = 1
+    
+    return y_pred
+
+def calc_accuracy(y_actual, tx, w, model):
+    if 'logistic' in model:
+        y_pred = predict_labels(w, tx, True)
+    else:
+        y_pred = predict_labels(w, tx)
+
+    correct = np.sum(y_pred == y_actual)
+    return correct / len(y_actual)
 
 def calculate_logistic_loss(y, tx, w):
     """compute the loss: negative log likelihood."""
