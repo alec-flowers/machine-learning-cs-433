@@ -1,12 +1,10 @@
 from timeit import default_timer as timer
 
 import numpy as np
-from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
-    logistic_regression, regularized_logistic_regression
-from data_process import impute, normalize
+from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, logistic_regression, regularized_logistic_regression
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
-
+from data_process import impute, normalize, standardize
 
 def product(*args, repeat=1):
     # product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
@@ -54,9 +52,8 @@ def build_k_indices(y, k_fold, seed):
                  for k in range(k_fold)]
     return np.array(k_indices)
 
-
-def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
-    """return the loss of the specified model"""
+def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
+    x[x <= -999] = np.nan
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
         # get k'th subgroup in test, others in train: TODO
@@ -73,10 +70,9 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         test_x = np.zeros(x.shape)
         test_y = np.zeros(y.shape)
 
-    train_x = impute(train_x, 'median') 
-    train_x = normalize(train_x)
-    test_x = impute(test_x, 'median')
-    test_x = normalize(test_x)
+    train_median = np.nanmedian(train_x, axis = 0)
+    train_x = impute(train_x, train_median)
+    test_x = impute(test_x, train_median)
 
     split = train_x.shape[0]
     temp_x = np.append(train_x, test_x, axis = 0)
@@ -100,25 +96,49 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
     train_x = poly_x[:split]
     test_x = poly_x[split:]
 
+    to_standardize = True
+    if to_standardize:
+        train_mean = np.nanmean(train_x, axis = 0)
+        train_sd = np.nanstd(train_x, axis = 0)
+
+        train_x = standardize(train_x, train_mean, train_sd)
+        test_x = standardize(test_x, train_mean, train_sd)
+
+    to_normalize = False
+    if to_normalize:
+        train_max = np.amax(train_x, axis = 0)
+        train_min = np.amin(train_x, axis = 0)
+
+        train_x = normalize(train_x, train_max, train_min)
+        test_x = normalize(test_x, train_max, train_min)
+    
+    return train_x, train_y, test_x, test_y
+
+
+def cross_validation(train_x, train_y, test_x, test_y, hp, model):
+    """return the loss of the specified model"""
+
     # Calculation of losses using the specified model
     # gradient descent:
     if model == 'gd':
         initial_w = [0 for _ in range(train_x.shape[1])]
         epsilon = hp['epsilon']
         gamma = hp['gamma']
+        max_iters = hp['max_iters']
 
-        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, epsilon, gamma)
+        weights, loss_tr = gradient_descent(train_y, train_x, initial_w, max_iters, epsilon, gamma)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
     elif model == 'sgd':
         initial_w = [0 for _ in range(train_x.shape[1])]
+        max_iters = hp['max_iters']
         batch_size = hp['batch_size']
         num_batches = hp['num_batches']
         epsilon = hp['epsilon']
         gamma = hp['gamma']
 
-        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, batch_size, epsilon, gamma,
+        weights, loss_tr = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,batch_size, epsilon, gamma,
                                                        num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
@@ -159,11 +179,9 @@ def cross_validation(y, x, k_indices, k, hp, model, cross_validate=True):
         batch_size = hp['batch_size']
 
         weights, loss_tr = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, threshold, gamma,
-                                                           lambda_, batch_size,
-                                                           num_batches)
+                                                           lambda_, batch_size, num_batches)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
-
-    acc = calc_accuracy(test_y, test_x, weights)
+    acc = calc_accuracy(test_y, test_x, weights, model)
 
     return loss_tr, loss_te, acc, weights

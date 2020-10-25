@@ -10,6 +10,8 @@ def load_csv_data(data_path, skip_header = 1, sub_sample=False):
     ids = x[:, 0].astype(np.int)
     input_data = x[:, 2:]
 
+    #x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
+
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
     yb[np.where(y=='b')] = 0
@@ -26,15 +28,6 @@ def load_csv_data(data_path, skip_header = 1, sub_sample=False):
 def save_csv_data(data_path, data):
     print('---Saving Data---')
     np.savetxt(data_path, data, delimiter = ",", header = 'Take some space')
-
-def predict_labels(weights, data):
-    """Generates class predictions given weights, and a test data matrix"""
-    y_pred = np.dot(data, weights)
-    y_pred[np.where(y_pred <= 0)] = -1
-    y_pred[np.where(y_pred > 0)] = 1
-    
-    return y_pred
-
 
 def create_csv_submission(ids, y_pred, name):
     """

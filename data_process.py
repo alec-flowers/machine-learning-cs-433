@@ -2,30 +2,31 @@ from timeit import default_timer as timer
 from proj1_helpers import load_csv_data, save_csv_data
 import numpy as np
 
-def impute(data, how = 'median'):
+def standardize(data, mean, std):
     '''
-    Imputes the -999 values with either the mean or median of the column.
+    Standardize data and subtract mean divide by standard deviation.
     '''
-
-    data[data <= -999] = np.nan
-    if how == 'mean':
-        col_agg = np.nanmean(data, axis = 0)
-    elif how == 'median':
-        col_agg = np.nanmedian(data,axis = 0)
-    
-    inds = np.where(np.isnan(data))
-    data[inds] = np.take(col_agg, inds[1])
+    data = (data - mean)
+    #because column 1 are all 1's the std deviation is 0. Fixing divide by 0 error
+    data = np.divide(data, std, out=np.ones((data.shape[0],data.shape[1])), where=std!=0)
 
     return data
 
-def normalize(data):
+def impute(data, median):
     '''
-    Normalize data and subtract mean divide by standard deviation.
+    Imputes the -999 values with either the mean or median of the column.
     '''
-    mean = np.nanmean(data, axis = 0)
-    std = np.nanstd(data, axis = 0)
-    data = (data - mean) / std
+    inds = np.where(np.isnan(data))
+    data[inds] = np.take(median, inds[1])
 
+    return data
+
+def normalize(data, max_ , min_):
+
+    data = (data - min_)
+    diff = max_ - min_
+    data = np.divide(data, diff, out=np.ones((data.shape[0],data.shape[1])), where=diff!=0)
+    
     return data
 
 def main():

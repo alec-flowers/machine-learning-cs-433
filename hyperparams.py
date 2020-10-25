@@ -5,7 +5,7 @@ import argparse
 from os import path
 
 from proj1_helpers import load_csv_data
-from kfold_cv import ParameterGrid, cross_validation, build_k_indices
+from kfold_cv import ParameterGrid, cross_validation, build_k_indices, cv_kfold
 from helpers import write_json, read_json
 
 
@@ -50,6 +50,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     loss = []
     accuracy = []
     weights = []
+    poly_dict = {}
 
     # Loop over different combinations of hyperparameters to find the best one
     for hp in hyperparam:
@@ -60,7 +61,16 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
-            loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hp, model)
+            if k in poly_dict and hp['degrees'] in poly_dict[k]:
+                train_x = poly_dict[k][hp['degrees']][0]
+                train_y = poly_dict[k][hp['degrees']][1]
+                test_x = poly_dict[k][hp['degrees']][2]
+                test_y = poly_dict[k][hp['degrees']][3]
+            else:
+                train_x, train_y, test_x, test_y = cv_kfold(y, x, k_indices, k, hp)
+                poly_dict[k] = {}
+                poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
+            loss_tr, loss_te, acc, weight = cross_validation(train_x, train_y, test_x, test_y, hp, model)
             loss_list.append(loss_te)
             acc_list.append(acc)
         loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
@@ -96,12 +106,12 @@ def find_hyperparams(model):
 
 def read_hyperparam_input(model):
     DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = path.join(DATA_FOLDER, "p_train.csv")
+    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
     hyperparameters = read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
     end = timer()
     print(f'Data Loaded - Time: {end - start:.3f}\n')
