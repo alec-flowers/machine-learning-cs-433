@@ -89,7 +89,7 @@ def gradient_descent(y, tx, initial_w, max_iters, epsilon, gamma, error_type='MS
     return ws[-1], losses[-1]
 
 
-def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches):
+def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon, gamma, num_batches, error_type='MSE'):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -132,13 +132,13 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
 
     W0 = 0
     ws = [initial_w]
-    losses = [compute_mse(y, tx, ws[W0])]
+    losses = [compute_loss(y, tx, ws[W0], error_type)]
 
     for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
-            loss = compute_mse(y, tx, ws[-1])
+            loss = compute_loss(y, tx, w, error_type)
 
             ws.append(w)
             losses.append(loss)

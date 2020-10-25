@@ -9,7 +9,8 @@ def compute_error(y, tx, w):
     """
     return y - tx.dot(w)
 
-#!!!!!!
+
+# !!!!!!
 # def compute_mse(y, tx, w):
 #     """Calculate the loss using MSE (Mean Squared Error). """
 #     N = len(y)
@@ -82,8 +83,9 @@ def sigmoid(t):
     sigmoid = 1 / (1 + np.exp(-t))
     return sigmoid
 
+
 ### !!!!
-def predict_labels(weights, data, log = False):
+def predict_labels(weights, data, log=False):
     """
     Generates class predictions given weights, and a test data matrix
 
@@ -112,7 +114,7 @@ def predict_labels(weights, data, log = False):
 
     y_pred[np.where(y_pred <= .5)] = 0
     y_pred[np.where(y_pred > .5)] = 1
-    
+
     return y_pred
 
 
@@ -152,9 +154,9 @@ def calc_accuracy(y_actual, tx, w, model):
 def calculate_logistic_loss(y, tx, w):
     """Computes the loss: negative log likelihood."""
     pred = sigmoid(tx @ w)
-    loss = y.T.dot(np.log(pred)) + (1-y).T.dot(np.log(1-pred))
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
     N = len(y)
-    return np.squeeze(-loss)/N
+    return np.squeeze(-loss) / N
 
 
 def test():
