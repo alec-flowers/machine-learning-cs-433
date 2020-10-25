@@ -5,7 +5,7 @@ import argparse
 from os import path
 
 from proj1_helpers import load_csv_data
-from kfold_cv import ParameterGrid, cross_validation, build_k_indices
+from kfold_cv import ParameterGrid, cross_validation, build_k_indices, cv_kfold
 from helpers import write_json, read_json
 
 
@@ -50,6 +50,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     loss = []
     accuracy = []
     weights = []
+    poly_dict = {}
 
     # Loop over different combinations of hyperparameters to find the best one
     for hp in hyperparam:
@@ -60,7 +61,16 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
-            loss_tr, loss_te, acc, weight = cross_validation(y, x, k_indices, k, hp, model)
+            if k in poly_dict and hp['degrees'] in poly_dict[k]:
+                train_x = poly_dict[k][hp['degrees']][0]
+                train_y = poly_dict[k][hp['degrees']][1]
+                test_x = poly_dict[k][hp['degrees']][2]
+                test_y = poly_dict[k][hp['degrees']][3]
+            else:
+                train_x, train_y, test_x, test_y = cv_kfold(y, x, k_indices, k, hp)
+                poly_dict[k] = {}
+                poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
+            loss_tr, loss_te, acc, weight = cross_validation(train_x, train_y, test_x, test_y, hp, model)
             loss_list.append(loss_te)
             acc_list.append(acc)
         loss.append(np.mean(loss_list))  # This is a list of loss* for each group of hyperparameters
