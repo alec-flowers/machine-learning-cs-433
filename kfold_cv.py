@@ -6,6 +6,9 @@ from costs import compute_loss, calc_accuracy
 from helpers import build_poly
 from data_process import impute, normalize, standardize
 
+
+# K-Fold Cross Validation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 def product(*args, repeat=1):
     # product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
     # product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
@@ -79,15 +82,8 @@ def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
 
     # Making polynomial if asked
     if 'degrees' in hp.keys():
-        # Checks if the polynomial has already been calculated
-        #if hp['degrees'] in poly_dict:
-        #    px = poly_dict[hp['degrees']]
-        # Calculates the polynomial and saves it in a dictionary
-        #else:
-
         start = timer()
         poly_x, _ = build_poly(temp_x, hp['degrees'])
-        #poly_dict[hp['degrees']] = px
         end = timer()
         print(f'Poly Time: {end - start:.3f}')
     else:
@@ -116,7 +112,7 @@ def cv_kfold(y, x, k_indices, k, hp, cross_validate = True):
 
 
 def cross_validation(train_x, train_y, test_x, test_y, hp, model):
-    """return the loss of the specified model"""
+    """Returns the loss of the specified model"""
 
     # Calculation of losses using the specified model
     # gradient descent:

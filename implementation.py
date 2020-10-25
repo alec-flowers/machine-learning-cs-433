@@ -136,10 +136,6 @@ def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, epsilon
 
     for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
-            '''note if we choose a batch_iter(num_batches > 1) then this will not be
-            updating properly because I use n_iter to index into ws and compute the loss 
-            which does not increase if we loop throug this for loop multiple times. Try putting 2 
-            in num_batches you will see what I am saying.'''
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
             loss = compute_mse(y, tx, ws[-1])
@@ -299,6 +295,6 @@ def regularized_logistic_regression(y, tx, initial_w, max_iters, threshold, gamm
         # converge criterion
         if len(losses) > 1 and np.abs(losses[-1] - losses[-2]) < threshold:
             break
-    #print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+
     return ws[-1], losses[-1]
 

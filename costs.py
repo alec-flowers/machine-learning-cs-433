@@ -9,21 +9,21 @@ def compute_error(y, tx, w):
     """
     return y - tx.dot(w)
 
-
-def compute_mse(y, tx, w):
-    """Calculate the loss using MSE (Mean Squared Error). """
-    N = len(y)
-    e = compute_error(y, tx, w)
-    loss = 1 / (2 * N) * np.sum(e ** 2)
-    return loss
-
-
-def compute_mae(y, tx, w):
-    """Calculate the loss using MAE (Mean Absolute Error)."""
-    N = len(y)
-    e = compute_error(y, tx, w)
-    loss = 1 / (2 * N) * np.sum(np.abs(e))
-    return loss
+#!!!!!!
+# def compute_mse(y, tx, w):
+#     """Calculate the loss using MSE (Mean Squared Error). """
+#     N = len(y)
+#     e = compute_error(y, tx, w)
+#     loss = 1 / (2 * N) * np.sum(e ** 2)
+#     return loss
+#
+#
+# def compute_mae(y, tx, w):
+#     """Calculate the loss using MAE (Mean Absolute Error)."""
+#     N = len(y)
+#     e = compute_error(y, tx, w)
+#     loss = 1 / (2 * N) * np.sum(np.abs(e))
+#     return loss
 
 
 def mse(e):
@@ -43,7 +43,7 @@ def rmse(e):
 
 def compute_loss(y, tx, w, error_fn='MSE'):
     """
-    Calculate the loss between dependent variable and prediction.
+    Calculates the loss between dependent variable and prediction.
 
     Parameters
     ----------
@@ -76,13 +76,35 @@ def compute_loss(y, tx, w, error_fn='MSE'):
         raise NotImplementedError('Did not match a loss function')
     return error
 
+
 def sigmoid(t):
-    """apply the sigmoid function on t."""
+    """Applies the sigmoid function on t."""
     sigmoid = 1 / (1 + np.exp(-t))
     return sigmoid
 
+### !!!!
 def predict_labels(weights, data, log = False):
-    """Generates class predictions given weights, and a test data matrix"""
+    """
+    Generates class predictions given weights, and a test data matrix
+
+    Parameters
+    ----------
+    weights : ndarray of shape (n_weights,)
+        Weight vector
+
+    data : ndarray of shape (n_samples, n_features)
+        Test data
+
+    log : bool
+        True if using (regularized) logistic regression
+
+
+    Returns
+    ----------
+    y_pred : ndarray of shape (n_samples,)
+        Array of predicted labels
+    """
+
     if log:
         y_pred = sigmoid(np.dot(data, weights))
     else:
@@ -93,28 +115,47 @@ def predict_labels(weights, data, log = False):
     
     return y_pred
 
+
 def calc_accuracy(y_actual, tx, w, model):
+    """
+    Calculates accuracy of the predicted labels of a test set for a given model
+
+    Parameters
+    ----------
+    y_actual : ndarray of shape (n_samples,)
+        Array of actual (real) labels
+
+    tx : ndarray of shape (n_samples, n_features)
+        Test data
+
+    w : ndarray of shape (n_weights,)
+        Weight vector
+
+    model : string selecting ['gd', 'sgd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic']
+        Machine learning methods
+
+    Returns
+    ----------
+    accuracy : np.float64
+        Accuracy of the predicted labels
+    """
     if 'logistic' in model:
         y_pred = predict_labels(w, tx, True)
     else:
         y_pred = predict_labels(w, tx)
 
     correct = np.sum(y_pred == y_actual)
-    return correct / len(y_actual)
+    accuracy = correct / len(y_actual)
+    return accuracy
+
 
 def calculate_logistic_loss(y, tx, w):
-    """compute the loss: negative log likelihood."""
+    """Computes the loss: negative log likelihood."""
     pred = sigmoid(tx @ w)
-    loss1 = y.T.dot(np.log(pred))
-    loss2 = (1-y).T.dot(np.log(1-pred))
-    loss = loss1 + loss2
-    N = len(y) ###!!!!!
+    loss = y.T.dot(np.log(pred)) + (1-y).T.dot(np.log(1-pred))
+    N = len(y)
     return np.squeeze(-loss)/N
-    #### JANET:
-    #log = np.sum(np.log(1 + np.exp(tx @ w)))
-    #minus = - np.sum(y * (tx @ w))
-    #loss = minus + log
-    #return loss
+
 
 def test():
     y = np.array([2, 3, 4, 3])
