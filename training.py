@@ -46,6 +46,8 @@ def train(model, seed=1):
     # do data parameters
     if 'degrees' not in hyperparameters.keys():
         raise KeyError("Hyperparameters should at least have degree as a key!")
+    # build folds needs hyperparameter values as individual values and not as lists
+    hyperparameters = {key: hyperparameters[key][0] for key in hyperparameters.keys()}
     train_x, train_y, test_x, test_y = build_folds(y, x, [], -1, hyperparameters, cross_validate=False)
     print(f"Starting training of {model}...")
     loss_tr, _, _, weight = cross_validation(train_x, train_y, test_x, test_y, hyperparameters, model)
