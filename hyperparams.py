@@ -113,7 +113,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         weights.append(weight)
         end = timer()
         if learning_curve_list[0]:
-            learning_curve_plot(learning_curve_list)
+            learning_curve_plot(learning_curve_list, model, hp)
 
         print(
             f'Hyperparameters: {hp}  Avg Loss: {np.mean(loss_list):.5f} Avg Accuracy: {accuracy[-1]:.4f} Time: {(end - start):.3f}')

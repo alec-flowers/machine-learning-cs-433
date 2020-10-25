@@ -80,7 +80,7 @@ def gradient_descent_visualization(
     return fig
 
 
-def learning_curve_plot(learning_curve):
+def learning_curve_plot(learning_curve, model, hp):
     fig, ax = plt.subplots(figsize=(11, 6))
     avg_test = []
     avg_train = []
@@ -103,8 +103,8 @@ def learning_curve_plot(learning_curve):
     ax.set_ylabel('MSE', fontsize = 16)
     ax.set_title('Learning Curve Convergence', fontsize = 18)
 
-    fig.savefig('./img/Learning_Curve.png')
-    plt.show()
+    #fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
+    #print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
     
     
 from training import read_training_set, read_best_hyperparameters
