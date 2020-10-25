@@ -5,7 +5,7 @@ from os import path
 
 from proj1_helpers import load_csv_data
 from helpers import read_json, build_poly, write_json
-from kfold_cv import cross_validation
+from kfold_cv import cross_validation, build_folds
 
 
 def parse_args():
@@ -39,20 +39,16 @@ def read_training_set():
     return y, x, ids_train
 
 
-def train(model):
+def train(model, seed=1):
     y, x, ids_train = read_training_set()
     hyperparameters = read_best_hyperparameters(model)
 
-    # build polynomial from hyperparams
-    if 'degrees' in hyperparameters.keys():
-        start = timer()
-        px, ind = build_poly(x, hyperparameters['degrees'])
-        print(f'Poly Time: {timer() - start:.3f}')
-    else:
+    # do data parameters
+    if 'degrees' not in hyperparameters.keys():
         raise KeyError("Hyperparameters should at least have degree as a key!")
-
+    train_x, train_y, test_x, test_y = build_folds(y, x, [], -1, hyperparameters, cross_validate=False)
     print(f"Starting training of {model}...")
-    loss_tr, _, _, weight = cross_validation(y, px, [], 0, hyperparameters, model, cross_validate=False)
+    loss_tr, _, _, weight = cross_validation(train_x, train_y, test_x, test_y, hyperparameters, model)
     print("Finished...")
     print("Loss training: " + str(loss_tr))
     hyperparameters['weights'] = weight.tolist()
