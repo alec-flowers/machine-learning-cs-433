@@ -9,35 +9,6 @@ from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_fol
 from helpers import write_json, read_json
 from plots import learning_curve_plot
 
-# Hyperparameters selection ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-def parse_args():
-    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
-    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
-                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
-
-    args = parser.parse_args()
-
-    return args
-
-
-def find_hyperparams(model):
-    """
-    Main function which finds the best performing set of hyperparameters for a given model (['gd', 'sgd', 'ridge',
-    'least_squares', 'logistic', 'regularized_logistic']) and saves them into a .json file.
-    """
-
-    print(f"Loading data...")
-    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-    print(f"Starting selection of best performing hyperparameters of {model}...")
-    hp_star, loss_star, weights = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    print("Finished...")
-    print(f'Best performing hyperparameters: {hp_star}  , Loss: {loss_star:.5f} , Weights: {weights}')
-    print(f"Saving best performing hyperparameters as "f"best_hyperparams_{model}.json...")
-    save_hyperparams(model, hp_star)
-
-
-
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     """
@@ -77,7 +48,6 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         Weights computed using the given model and the best performing set of hyperparameters
     """
 
-
     # Combination of hyperparameters
     hyperparam = ParameterGrid(hyperparameters)
     loss = []
@@ -104,7 +74,8 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                 train_x, train_y, test_x, test_y = build_folds(y, x, k_indices, k, hp)
                 poly_dict[k] = {}
                 poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
-            loss_tr, loss_te, acc, weight, learning_curve = cross_validation(train_x, train_y, test_x, test_y, hp, model)
+            loss_tr, loss_te, acc, weight, learning_curve = cross_validation(train_x, train_y, test_x, test_y, hp,
+                                                                             model)
             loss_list.append(loss_te)
             acc_list.append(acc)
             learning_curve_list.append(learning_curve)
@@ -122,22 +93,23 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     min_acc_idx = np.argmax(accuracy)
     acc_star = accuracy[min_acc_idx]
     hp_star = list(hyperparam)[min_acc_idx]
-    hp_star = {key: [value] for key, value in hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
+    hp_star = {key: [value] for key, value in
+               hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
     w = weights[min_acc_idx]
 
     return hp_star, acc_star, w, accuracy
 
 
-def save_hyperparams(model, hp_star):
-    filename = f"hyperparams/best_hyperparams_{model}.json"
-    hp_star['model'] = [model]
-    write_json(filename, hp_star)
-
-
-def find_hyperparams(model):
-    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
-    hp_star, loss_star, weights, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
-    save_hyperparams(model, hp_star)
+# def save_hyperparams(model, hp_star):
+#     filename = f"hyperparams/best_hyperparams_{model}.json"
+#     hp_star['model'] = [model]
+#     write_json(filename, hp_star)
+#
+#
+# def find_hyperparams(model):
+#     y, x, ids_train, hyperparameters = read_hyperparam_input(model)
+#     hp_star, loss_star, weights, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+#     save_hyperparams(model, hp_star)
 
 
 def read_hyperparam_input(model):
@@ -164,9 +136,32 @@ def save_hyperparams(model, hp_star):
     Saves the best performing set of hyperparameters (hp_star) of a given model into a .json file
     """
     filename = f"hyperparams/best_hyperparams_{model}.json"
-    hp_star['model'] = model
     write_json(filename, hp_star)
 
+
+def find_hyperparams(model):
+    """
+    Main function which finds the best performing set of hyperparameters for a given model (['gd', 'sgd', 'ridge',
+    'least_squares', 'logistic', 'regularized_logistic']) and saves them into a .json file.
+    """
+    print(f"Loading data...")
+    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
+    print(f"Starting selection of best performing hyperparameters of {model}...")
+    hp_star, loss_star, weights, accuracy = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
+    print("Finished...")
+    print(f'Best performing hyperparameters: {hp_star}  , Loss: {loss_star:.5f} , Weights: {weights}')
+    print(f"Saving best performing hyperparameters as "f"best_hyperparams_{model}.json...")
+    save_hyperparams(model, hp_star)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
+    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
+                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
+
+    args = parser.parse_args()
+
+    return args
 
 
 if __name__ == "__main__":
