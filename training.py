@@ -2,7 +2,7 @@ import argparse
 from os import path
 
 from helper_files.data_io import write_json, read_training_set, read_best_hyperparameters
-from kfold_cv import cross_validation, build_folds
+from helper_files.kfold_cv import cross_validation, build_folds
 
 
 def parse_args():

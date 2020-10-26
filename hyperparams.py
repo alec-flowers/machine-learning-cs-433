@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 from os import path
 
-from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
+from helper_files.kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
 from helper_files.data_io import read_json, write_json, read_training_set
 
 
