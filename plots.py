@@ -10,6 +10,9 @@ from data_io import read_training_set, read_best_hyperparameters
 
 
 def viz_accuracy(k_folds=10, seed=1):
+    """
+    Plots boxplots for the classification accuracy of every model.
+    """
     fig, axs = plt.subplots(nrows=1, ncols=1)
     y, x, ids_train = read_training_set()
 
@@ -26,6 +29,20 @@ def viz_accuracy(k_folds=10, seed=1):
 
 
 def learning_curve_plot(learning_curve, model, hp):
+    """
+    Plots the learning curves for a cross validation on a set of folds.
+
+    Parameters
+    -------
+    learning_curve: list of lists
+        contains the loss over iteration for multiple folds
+
+    model: str
+        For which model to plot the loss curve. Needed for filenames.
+
+    hp: dict
+        set of best hyperparameters
+    """
     fig, ax = plt.subplots(figsize=(11, 6))
     avg_test = []
     avg_train = []
@@ -58,6 +75,9 @@ def learning_curve_plot(learning_curve, model, hp):
 
 
 def viz_loss(model, k_folds=4, seed=1):
+    """
+    Wrapper for the learning curve plot.
+    """
     y, x, ids_train = read_training_set()
     hyperparameters = read_best_hyperparameters(model)
     _, _, _, _, learning_curves_list = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
