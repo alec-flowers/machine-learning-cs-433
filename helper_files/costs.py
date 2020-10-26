@@ -3,7 +3,7 @@
 import numpy as np
 
 from helpers import sigmoid
-from data_io import predict_labels
+from helper_files.data_io import predict_labels
 
 
 def compute_error(y, tx, w):

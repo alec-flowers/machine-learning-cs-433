@@ -1,7 +1,7 @@
 import numpy as np
 
-from costs import *
-from helpers import batch_iter
+from helper_files.costs import compute_loss, compute_error, calculate_logistic_loss
+from helpers import batch_iter, sigmoid
 
 # Machine Learning Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

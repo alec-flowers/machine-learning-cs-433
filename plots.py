@@ -6,7 +6,7 @@ import argparse
 
 from hyperparams import best_model_selection
 from helpers import models, model_to_string
-from data_io import read_training_set, read_best_hyperparameters
+from helper_files.data_io import read_training_set, read_best_hyperparameters
 
 
 def viz_accuracy(k_folds=10, seed=1):

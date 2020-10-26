@@ -1,7 +1,7 @@
 import argparse
 from os import path
 
-from data_io import write_json, read_training_set, read_best_hyperparameters
+from helper_files.data_io import write_json, read_training_set, read_best_hyperparameters
 from kfold_cv import cross_validation, build_folds
 
 
