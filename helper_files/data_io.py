@@ -17,6 +17,7 @@ def load_csv_data(data_path, skip_header=1, sub_sample=False):
     # column 4 stays delete (5, 6, 12, 26, 27, 28)
     # column 9 stays delete (21, 29)
     # x = np.delete(x,[5,6,12,21,26,27,28,29],axis = 1)
+    input_data = np.delete(input_data,[_ for _ in range(12,30)] ,axis = 1)
 
     # convert class labels from strings to binary (-1,1)
     yb = np.ones(len(y))
@@ -95,7 +96,7 @@ def read_training_set():
     TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
     print(f'Data Loaded - Time: {timer() - start:.3f}\n')
 
     return y, x, ids_train
