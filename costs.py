@@ -2,6 +2,8 @@
 """Functions used to compute the loss."""
 import numpy as np
 
+from helpers import predict_labels
+
 
 def compute_error(y, tx, w):
     """
@@ -61,51 +63,6 @@ def compute_loss(y, tx, w, error_fn='MSE'):
     return error
 
 
-def sigmoid(t):
-    """Applies the sigmoid function on t."""
-    sigmoid = 1 / (1 + np.exp(-t))
-    return sigmoid
-
-
-def predict_labels_submission(weights, data, log=False):
-    y_pred = predict_labels(weights, data, log=log)
-    y_pred[np.where(y_pred == 0)] = -1
-    return y_pred
-
-
-def predict_labels(weights, data, log=False):
-    """
-    Generates class predictions given weights, and a test data matrix
-
-    Parameters
-    ----------
-    weights : ndarray of shape (n_weights,)
-        Weight vector
-
-    data : ndarray of shape (n_samples, n_features)
-        Test data
-
-    log : bool
-        True if using (regularized) logistic regression
-
-
-    Returns
-    ----------
-    y_pred : ndarray of shape (n_samples,)
-        Array of predicted labels
-    """
-
-    if log:
-        y_pred = sigmoid(np.dot(data, weights))
-    else:
-        y_pred = np.dot(data, weights)
-
-    y_pred[np.where(y_pred <= .5)] = 0
-    y_pred[np.where(y_pred > .5)] = 1
-
-    return y_pred
-
-
 def calc_accuracy(y_actual, tx, w, model):
     """
     Calculates accuracy of the predicted labels of a test set for a given model
@@ -139,6 +96,12 @@ def calc_accuracy(y_actual, tx, w, model):
     return accuracy
 
 
+def sigmoid(t):
+    """Applies the sigmoid function on t."""
+    sigmoid = 1 / (1 + np.exp(-t))
+    return sigmoid
+
+
 def calculate_logistic_loss(y, tx, w):
     """Computes the loss: negative log likelihood."""
     pred = sigmoid(tx @ w)
@@ -146,16 +109,3 @@ def calculate_logistic_loss(y, tx, w):
     N = len(y)
     return np.squeeze(-loss) / N
 
-
-def test():
-    y = np.array([2, 3, 4, 3])
-    tx = np.array([[1, 7], [1, 3], [1, 1], [1, 2]])
-    w = np.array([1, 2])
-    mse = compute_loss(y, tx, w, error_fn='MSE')
-    mae = compute_loss(y, tx, w, error_fn='MAE')
-    print("MSE: " + str(mse))
-    print("MAE: " + str(mae))
-
-
-if __name__ == "__main__":
-    test()

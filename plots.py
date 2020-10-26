@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-from training import read_training_set, read_best_hyperparameters
 from hyperparams import best_model_selection
-from helpers import models, model_to_string
+from helpers import models, model_to_string, read_training_set, read_best_hyperparameters
 
 
 def viz_accuracy(k_folds=10, seed=1):

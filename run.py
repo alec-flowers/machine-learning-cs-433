@@ -1,7 +1,6 @@
-from helpers import load_csv_data, create_csv_submission, read_json
-from costs import predict_labels_submission
+from helpers import load_csv_data, create_csv_submission, read_json, read_best_hyperparameters, \
+    predict_labels_submission
 from kfold_cv import build_folds
-from training import read_best_hyperparameters
 
 from os import path
 import argparse
@@ -54,7 +53,6 @@ def main(args):
         Return
         ----------
         submission.csv : the predicted labels on the test set
-
         """
     model = args.method
     # get weights

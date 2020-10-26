@@ -1,25 +1,11 @@
 from timeit import default_timer as timer
-
 import numpy as np
+
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
     logistic_regression, regularized_logistic_regression
 from costs import compute_loss, calc_accuracy
 from helpers import build_poly
-from data_process import impute, normalize, standardize
-
-
-def product(*args, repeat=1):
-    """
-    Creates all possible combinations between lists given in *args:
-    product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
-    product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
-    """
-    pools = [tuple(pool) for pool in args] * repeat
-    result = [[]]
-    for pool in pools:
-        result = [x + [y] for x in result for y in pool]
-    for prod in result:
-        yield tuple(prod)
+from data_pre_process import impute, standardize
 
 
 class ParameterGrid:
@@ -45,6 +31,20 @@ class ParameterGrid:
                 for v in product(*values):
                     params = dict(zip(keys, v))
                     yield params
+
+
+def product(*args, repeat=1):
+    """
+    Creates all possible combinations between lists given in *args:
+    product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
+    product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
+    """
+    pools = [tuple(pool) for pool in args] * repeat
+    result = [[]]
+    for pool in pools:
+        result = [x + [y] for x in result for y in pool]
+    for prod in result:
+        yield tuple(prod)
 
 
 def build_k_indices(y, k_fold, seed):
@@ -114,23 +114,11 @@ def build_folds(y, x, k_indices, k, hp, cross_validate=True):
 
     train_x = poly_x[:split]
     test_x = poly_x[split:]
+    train_mean = np.nanmean(train_x, axis=0)
+    train_sd = np.nanstd(train_x, axis=0)
+    train_x = standardize(train_x, train_mean, train_sd)
+    test_x = standardize(test_x, train_mean, train_sd)
 
-    to_standardize = True
-    if to_standardize:
-        train_mean = np.nanmean(train_x, axis=0)
-        train_sd = np.nanstd(train_x, axis=0)
-
-        train_x = standardize(train_x, train_mean, train_sd)
-        test_x = standardize(test_x, train_mean, train_sd)
-
-    # not part of our pre-processing, left in for completeness
-    # to_normalize = False
-    # if to_normalize:
-    #     train_max = np.amax(train_x, axis=0)
-    #     train_min = np.amin(train_x, axis=0)
-    #
-    #     train_x = normalize(train_x, train_max, train_min)
-    #     test_x = normalize(test_x, train_max, train_min)
     print("Pre-Processing finished...")
     return train_x, train_y, test_x, test_y
 

@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """some helper functions."""
+from os import path
+from timeit import default_timer as timer
 
 import numpy as np
 import json
 import csv
+
+from costs import sigmoid
 
 models = ["gd", "sgd", "ridge", "least_squares", "logistic", "regularized_logistic"]
 model_to_string = {
@@ -235,3 +239,91 @@ def create_csv_submission(ids, y_pred, name):
         writer.writeheader()
         for r1, r2 in zip(ids, y_pred):
             writer.writerow({'Id': int(r1), 'Prediction': int(r2)})
+
+
+def read_training_set():
+    """
+    Reads training data.
+
+    Returns
+    ----------
+    y : ndarray of shape (n_samples,)
+        Array of labels
+
+    x : ndarray of shape (n_samples, n_features)
+        Training data
+
+    ids_train : ndarray of shape (n_samples,)
+        IDs of data
+    """
+
+    DATA_FOLDER = 'Data/'
+    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
+
+    start = timer()
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
+    print(f'Data Loaded - Time: {timer() - start:.3f}\n')
+
+    return y, x, ids_train
+
+
+def read_best_hyperparameters(model):
+    """
+    Reads the input best performing set of hyperparameters for a given model.
+
+    Parameters
+    ----------
+    model : string selecting ['gd', 'sgd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic']
+        Machine learning methods
+
+    Returns
+    ----------
+    hyperparameters : dict containing the best performing set of hyperparameters
+    """
+
+    HYPERPARAMS_FOLDER = 'hyperparams/'
+    HYPERPARAMS_BEST_VALUES = f'best_hyperparams_{model}.json'
+
+    filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)
+    hyperparameters = read_json(filename)
+
+    return hyperparameters
+
+
+def predict_labels_submission(weights, data, log=False):
+    y_pred = predict_labels(weights, data, log=log)
+    y_pred[np.where(y_pred == 0)] = -1
+    return y_pred
+
+
+def predict_labels(weights, data, log=False):
+    """
+    Generates class predictions given weights, and a test data matrix
+
+    Parameters
+    ----------
+    weights : ndarray of shape (n_weights,)
+        Weight vector
+
+    data : ndarray of shape (n_samples, n_features)
+        Test data
+
+    log : bool
+        True if using (regularized) logistic regression
+
+
+    Returns
+    ----------
+    y_pred : ndarray of shape (n_samples,)
+        Array of predicted labels
+    """
+
+    if log:
+        y_pred = sigmoid(np.dot(data, weights))
+    else:
+        y_pred = np.dot(data, weights)
+
+    y_pred[np.where(y_pred <= .5)] = 0
+    y_pred[np.where(y_pred > .5)] = 1
+
+    return y_pred
