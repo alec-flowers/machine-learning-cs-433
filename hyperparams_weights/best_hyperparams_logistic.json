@@ -1,1 +1,1 @@
-{"batch_size": [1], "degrees": [2], "gamma": [0.00001], "max_iters": [2500], "num_batches": [1]}
+{"batch_size": [1], "degrees": [2], "gamma": [0.0000001], "max_iters": [2500], "num_batches": [1]}
