@@ -75,12 +75,10 @@
   },
   "regularized_logistic": {
     "max_iters": [
-      2000
+      3000
     ],
     "gamma": [
-      1e-6,
-      1e-5,
-      1e-4
+      1e-6
     ],
     "num_batches": [
       1
@@ -89,14 +87,10 @@
       1
     ],
     "degrees": [
-      1,
       2
     ],
     "lambda_": [
-      0.1,
-      0.2,
-      0.3,
-      0.4
+      0
     ]
   }
 }

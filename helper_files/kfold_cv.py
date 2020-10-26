@@ -106,7 +106,13 @@ def build_folds(y, x, k_indices, k, hp, cross_validate=True):
     # Making polynomial if asked
     if 'degrees' in hp.keys():
         start = timer()
+        if 'poly_indices' in hp.keys():
+            temp_x_append = np.delete(temp_x, hp['poly_indices'], axis = 1)
+            temp_x = temp_x[:, hp['poly_indices']]
         poly_x, _ = build_poly(temp_x, hp['degrees'])
+        if 'poly_indices' in hp.keys():
+            poly_x = np.c_[poly_x, temp_x_append]
+
         end = timer()
         print(f'Poly Time: {end - start:.3f}')
     else:
