@@ -196,9 +196,7 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, gamma,
-                                                               batch_size,
-                                                               num_batches, test_y, test_x)
+        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, gamma, test_y=test_y, test_x=test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # regularized logistic regression:
@@ -212,8 +210,8 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
 
         weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters,
                                                                            gamma,
-                                                                           lambda_, batch_size, num_batches, test_y,
-                                                                           test_x)
+                                                                           lambda_, test_y=test_y,
+                                                                           test_x=test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     acc = calc_accuracy(test_y, test_x, weights, model)
