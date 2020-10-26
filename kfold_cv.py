@@ -8,11 +8,12 @@ from helpers import build_poly
 from data_process import impute, normalize, standardize
 
 
-# K-Fold Cross Validation ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 def product(*args, repeat=1):
-    # product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
-    # product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
+    """
+    Creates all possible combinations between lists given in *args:
+    product('ABCD', 'xy') --> Ax Ay Bx By Cx Cy Dx Dy
+    product(range(2), repeat=3) --> 000 001 010 011 100 101 110 111
+    """
     pools = [tuple(pool) for pool in args] * repeat
     result = [[]]
     for pool in pools:
@@ -58,11 +59,30 @@ def build_k_indices(y, k_fold, seed):
 
 
 def build_folds(y, x, k_indices, k, hp, cross_validate=True):
+    """
+    Builds the folds specified in the arguments.
+
+    Parameters
+    -------
+    hp: dict containing a set of hyperparameters
+
+    x : ndarray of shape (n_samples, n_features)
+        Training data
+
+    y : ndarray of shape (n_samples,)
+        Array of labels
+
+    k_indices : list
+        list holding the indices for every fold
+    k: int
+        which fold to build
+    cross_validate: bool
+        if False, build no test fold. Used in training.py
+    """
     print("Starting Pre-Processing...")
     x[x <= -999] = np.nan
     if cross_validate:
         assert k < len(k_indices), 'K is larger than the number of k-folds we create'
-        # get k'th subgroup in test, others in train: TODO
         train_i = np.concatenate(np.delete(k_indices, k, axis=0))
         test_i = k_indices[k]
 
@@ -103,19 +123,38 @@ def build_folds(y, x, k_indices, k, hp, cross_validate=True):
         train_x = standardize(train_x, train_mean, train_sd)
         test_x = standardize(test_x, train_mean, train_sd)
 
-    to_normalize = False
-    if to_normalize:
-        train_max = np.amax(train_x, axis=0)
-        train_min = np.amin(train_x, axis=0)
-
-        train_x = normalize(train_x, train_max, train_min)
-        test_x = normalize(test_x, train_max, train_min)
+    # not part of our pre-processing, left in for completeness
+    # to_normalize = False
+    # if to_normalize:
+    #     train_max = np.amax(train_x, axis=0)
+    #     train_min = np.amin(train_x, axis=0)
+    #
+    #     train_x = normalize(train_x, train_max, train_min)
+    #     test_x = normalize(test_x, train_max, train_min)
     print("Pre-Processing finished...")
     return train_x, train_y, test_x, test_y
 
 
 def cross_validation(train_x, train_y, test_x, test_y, hp, model):
-    """Returns the loss of the specified model"""
+    """
+    Builds the folds specified in the arguments.
+
+    Parameters
+    -------
+    train_x: ndarray of shape (n_train_samples, degree of polynomial expansion)
+
+    train_y : ndarray of shape (n_train_samples, )
+        Training data
+
+    test_x: ndarray of shape (n_test_samples, degree of polynomial expansion)
+        Array of labels
+
+    test_y: ndarray of shape (n_test_samples,)
+    hp: dict
+        dict containing the hyperparameters (e.g. learning rate)
+    model:
+        which model to do cross validation for
+    """
 
     # Calculation of losses using the specified model
     # gradient descent:
@@ -125,8 +164,8 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         gamma = hp['gamma']
         max_iters = hp['max_iters']
 
-        #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = gradient_descent(train_y, train_x, initial_w, max_iters, gamma, test_y, test_x)
+        weights, loss_tr, learning_curve = gradient_descent(train_y, train_x, initial_w, max_iters, gamma, test_y,
+                                                            test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # stochastic gradient descent:
@@ -137,9 +176,9 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         gamma = hp['gamma']
 
-        #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,batch_size, gamma,
-                                                       num_batches, test_y, test_x)
+        weights, loss_tr, learning_curve = stochastic_gradient_descent(train_y, train_x, initial_w, max_iters,
+                                                                       batch_size, gamma,
+                                                                       num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     # least squares:
@@ -155,7 +194,6 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         # calculate the loss for train and test data:
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
-    # logistic regression: TODO
     elif model == 'logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
@@ -163,12 +201,11 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, gamma, batch_size,
-                                               num_batches, test_y, test_x)
+        weights, loss_tr, learning_curve = logistic_regression(train_y, train_x, initial_w, max_iters, gamma,
+                                                               batch_size,
+                                                               num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
-    # regularized logistic regression: TODO
     elif model == 'regularized_logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
@@ -177,9 +214,10 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         num_batches = hp['num_batches']
         batch_size = hp['batch_size']
 
-        #if you don't want plots remove test_y and test_x
-        weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters, gamma,
-                                                           lambda_, batch_size, num_batches,test_y, test_x)
+        weights, loss_tr, learning_curve = regularized_logistic_regression(train_y, train_x, initial_w, max_iters,
+                                                                           gamma,
+                                                                           lambda_, batch_size, num_batches, test_y,
+                                                                           test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
     acc = calc_accuracy(test_y, test_x, weights, model)

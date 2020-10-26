@@ -46,9 +46,17 @@ def read_test_set():
 
 
 def main(args):
-    """
-    Produces the predictions aka the pipeline
-    """
+    """Compute a gradient for Logistic Regression loss.
+
+        Parameters
+        ----------
+        args.method: which model to make predictions with
+
+        Return
+        ----------
+        submission.csv : the predicted labels on the test set
+
+        """
     model = args.method
     # get weights
     weights = read_weights(model)
@@ -66,7 +74,7 @@ def main(args):
     else:
         y_pred = predict_labels_submission(weights, test_x_processed, log=False)
     # save the prediction
-    create_csv_submission(ids_test, y_pred, "test_submission.csv")
+    create_csv_submission(ids_test, y_pred, "submission.csv")
 
 
 def parse_args():

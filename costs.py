@@ -10,23 +10,6 @@ def compute_error(y, tx, w):
     return y - tx.dot(w)
 
 
-# !!!!!!
-# def compute_mse(y, tx, w):
-#     """Calculate the loss using MSE (Mean Squared Error). """
-#     N = len(y)
-#     e = compute_error(y, tx, w)
-#     loss = 1 / (2 * N) * np.sum(e ** 2)
-#     return loss
-#
-#
-# def compute_mae(y, tx, w):
-#     """Calculate the loss using MAE (Mean Absolute Error)."""
-#     N = len(y)
-#     e = compute_error(y, tx, w)
-#     loss = 1 / (2 * N) * np.sum(np.abs(e))
-#     return loss
-
-
 def mse(e):
     'Calculates and returns MSE between two vectors of same size'
     return np.sum(e ** 2) / (2 * len(e))
@@ -168,8 +151,8 @@ def test():
     y = np.array([2, 3, 4, 3])
     tx = np.array([[1, 7], [1, 3], [1, 1], [1, 2]])
     w = np.array([1, 2])
-    mse = compute_mse(y, tx, w)
-    mae = compute_mae(y, tx, w)
+    mse = compute_loss(y, tx, w, error_fn='MSE')
+    mae = compute_loss(y, tx, w, error_fn='MAE')
     print("MSE: " + str(mse))
     print("MAE: " + str(mae))
 

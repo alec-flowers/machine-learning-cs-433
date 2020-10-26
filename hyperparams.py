@@ -4,9 +4,9 @@ import numpy as np
 import argparse
 from os import path
 
-from proj1_helpers import load_csv_data
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
 from helpers import write_json, read_json
+from training import read_training_set
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
@@ -45,6 +45,10 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
 
     w : list
         Weights computed using the given model and the best performing set of hyperparameters
+    acc_list: list
+        list with the test accuracies for the last hyperparameter combination, needed for the boxplots
+    learning_curve_list: list
+        list with the test losses from cross validation, needed for the loss plots
     """
 
     # Combination of hyperparameters
@@ -64,15 +68,18 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
         # Performs K-Cross Validation using the selected model to get the minimum loss
         start = timer()
         for k in range(k_fold):
+            # if polynomials were already calculated get from "cache"
             if k in poly_dict and hp['degrees'] in poly_dict[k]:
                 train_x = poly_dict[k][hp['degrees']][0]
                 train_y = poly_dict[k][hp['degrees']][1]
                 test_x = poly_dict[k][hp['degrees']][2]
                 test_y = poly_dict[k][hp['degrees']][3]
+            # if polynomials not calculated, calculate and save in "cache"
             else:
                 train_x, train_y, test_x, test_y = build_folds(y, x, k_indices, k, hp)
                 poly_dict[k] = {}
                 poly_dict[k][hp['degrees']] = [train_x, train_y, test_x, test_y]
+            # do cross validation
             loss_tr, loss_te, acc, weight, learning_curve = cross_validation(train_x, train_y, test_x, test_y, hp,
                                                                              model)
             loss_list.append(loss_te)
@@ -89,30 +96,22 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
     min_acc_idx = np.argmax(accuracy)
     acc_star = accuracy[min_acc_idx]
     hp_star = list(hyperparam)[min_acc_idx]
+    # needs params as a list for the enumeration in ParameterGrid to work
     hp_star = {key: [value] for key, value in
-               hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
+               hp_star.items()}
     w = weights[min_acc_idx]
 
     return hp_star, acc_star, w, acc_list, learning_curve_list
 
 
-def read_hyperparam_input(model):
+def read_init_hyperparam(model):
     """
     Reads the input collection of hyperparameters for a given model and loads the training dataset.
     """
-
-    DATA_FOLDER = 'Data/'
-    TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
     HYPERPARAMS_FOLDER = 'hyperparams/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
-    start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
-    hyperparameters = read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
-    end = timer()
-    print(f'Data Loaded - Time: {end - start:.3f}\n')
-
-    return y, x, ids_train, hyperparameters
+    return read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
 
 
 def save_hyperparams(model, hp_star):
@@ -129,7 +128,8 @@ def find_hyperparams(model):
     'least_squares', 'logistic', 'regularized_logistic']) and saves them into a .json file.
     """
     print(f"Loading data...")
-    y, x, ids_train, hyperparameters = read_hyperparam_input(model)
+    y, x, ids_train = read_training_set()
+    hyperparameters = read_init_hyperparam(model)
     print(f"Starting selection of best performing hyperparameters of {model}...")
     hp_star, acc_star, weights, accuracy, _ = best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1)
     print("Finished...")

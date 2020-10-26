@@ -4,10 +4,10 @@ import argparse
 from os import path
 
 from proj1_helpers import load_csv_data
-from helpers import read_json, build_poly, write_json
+
+from helpers import read_json, write_json
 from kfold_cv import cross_validation, build_folds
 
-# Training ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -34,16 +34,16 @@ def read_training_set():
     TRAIN_DATASET = path.join(DATA_FOLDER, "train.csv")
 
     start = timer()
-    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=False)
+    y, x, ids_train = load_csv_data(TRAIN_DATASET, sub_sample=True)
     print(f'Data Loaded - Time: {timer() - start:.3f}\n')
 
     return y, x, ids_train
 
 
-def train(model, seed=1):
+def train(model):
     """
     Main function which trains a given model (['gd', 'sgd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
-    using K-fold Cross Validation, finds and saves the weights with the corresponding hyperparameters.
+    using 0-fold Cross Validation (no test fold), finds and saves the weights with the corresponding hyperparameters.
     """
 
     y, x, ids_train = read_training_set()
