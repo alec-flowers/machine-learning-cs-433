@@ -99,14 +99,14 @@ def learning_curve_plot(learning_curve, model, hp):
     ax.plot(iters, np.mean(np.array(avg_test), axis=0), color='orange', linewidth=1.2, label='Avg Test Error')
     ax.plot(iters, np.mean(np.array(avg_train), axis=0), color='b', linewidth=1.2, label='Avg Train Error')
 
-    ax.legend(loc='upper right', fontsize = 24)
-    ax.set_xlabel('Iters', fontsize = 26)
+    ax.legend(loc='upper right', fontsize=24)
+    ax.set_xlabel('Iters', fontsize=26)
     if 'logistic' in model:
-        ax.set_ylabel('L2 Loss', fontsize = 26)
+        ax.set_ylabel('L2 Loss', fontsize=26)
     else:
-        ax.set_ylabel('MSE', fontsize = 26)
-    ax.set_title('Learning Curve Convergence', fontsize = 32)
-    ax.tick_params('both', labelsize = 18)
+        ax.set_ylabel('MSE', fontsize=26)
+    ax.set_title('Learning Curve Convergence', fontsize=32)
+    ax.tick_params('both', labelsize=18)
 
     fig.savefig(f'./img/Learning_Curve_{model}_{hp}.pdf')
     print(f'Plot Saved as - Learning_Curve_{model}_{hp}.pdf')
@@ -118,18 +118,19 @@ from hyperparams import best_model_selection
 from helpers import models, model_to_string
 
 
-def viz_accuracy(k_folds=4, seed=1):
-    fig, ax = plt.subplots(nrows=1, ncols=1)
+def viz_accuracy(k_folds=10, seed=1):
+    fig, axs = plt.subplots(nrows=1, ncols=1)
     y, x, ids_train = read_training_set()
 
     all_accuracies = []
-    for model in models:
+    for idx, model in enumerate(models):
         hyperparameters = read_best_hyperparameters(model)
         _, _, _, accuracies, _ = best_model_selection(model, hyperparameters, x, y, k_fold=k_folds, seed=seed)
         all_accuracies.append(accuracies)
-    ax.boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
-    ax.set_title("Boxplot of the Accuracy")
-    ax.set_ylabel("Accuracy")
+    axs.boxplot(all_accuracies, labels=[model_to_string[model] for model in models])
+    axs.set_ylabel("Accuracy on the Test Fold", fontsize=26)
+    axs.tick_params(axis='both', labelsize=26)
+    fig.suptitle("Boxplot of the Accuracies", fontsize=32)
     plt.show()
 
 
@@ -143,7 +144,7 @@ def viz_loss(model, k_folds=4, seed=1):
 def parse_args():
     parser = argparse.ArgumentParser(description="CLI for the plot.py which is used for plotting.")
     parser.add_argument('-p', '--plot', type=str, help='Which plot to generate.', required=True,
-                        choices=['box', 'gd', 'sgd', 'least_squares', 'ridge', 'logistic', 'regularized_logistic'])
+                        choices=['box', 'gd', 'sgd', 'logistic', 'regularized_logistic'])
     return parser.parse_args()
 
 
