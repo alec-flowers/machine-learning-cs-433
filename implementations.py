@@ -3,10 +3,6 @@ import numpy as np
 from helper_files.costs import compute_loss, compute_error, calculate_logistic_loss
 from helper_files.helpers import batch_iter, sigmoid
 
-# Machine Learning Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-"""Gradient Descent"""
-
 
 def compute_gradient(y, tx, w):
     """Compute a gradient for MSE.
