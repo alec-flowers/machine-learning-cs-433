@@ -1,8 +1,6 @@
-from proj1_helpers import load_csv_data, create_csv_submission
-from costs import predict_labels, predict_labels_submission
-from helpers import read_json
-from kfold_cv import build_folds
-from training import read_best_hyperparameters
+from helper_files.data_io import load_csv_data, create_csv_submission, read_json, read_best_hyperparameters, \
+    predict_labels_submission
+from helper_files.kfold_cv import build_folds
 
 from os import path
 import argparse
@@ -13,7 +11,7 @@ def read_weights(model):
     """
     Reads the weights for a corresponding model.
     """
-    WEIGHTS_DIR = "hyperparams"
+    WEIGHTS_DIR = "hyperparams_weights"
     WEIGHTS_FILENAME = f"weights_{model}.json"
     w = read_json(path.join(WEIGHTS_DIR, WEIGHTS_FILENAME))['weights']
     return w
@@ -46,9 +44,16 @@ def read_test_set():
 
 
 def main(args):
-    """
-    Produces the predictions aka the pipeline
-    """
+    """Compute a gradient for Logistic Regression loss.
+
+        Parameters
+        ----------
+        args.method: which model to make predictions with
+
+        Return
+        ----------
+        submission.csv : the predicted labels on the test set
+        """
     model = args.method
     # get weights
     weights = read_weights(model)
@@ -66,7 +71,7 @@ def main(args):
     else:
         y_pred = predict_labels_submission(weights, test_x_processed, log=False)
     # save the prediction
-    create_csv_submission(ids_test, y_pred, "test_submission.csv")
+    create_csv_submission(ids_test, y_pred, "submission.csv")
 
 
 def parse_args():
