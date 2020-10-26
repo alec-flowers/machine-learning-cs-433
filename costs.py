@@ -2,7 +2,8 @@
 """Functions used to compute the loss."""
 import numpy as np
 
-from helpers import predict_labels, sigmoid
+from helpers import sigmoid
+from data_io import predict_labels
 
 
 def compute_error(y, tx, w):

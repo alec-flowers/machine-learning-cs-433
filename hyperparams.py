@@ -5,7 +5,7 @@ import argparse
 from os import path
 
 from kfold_cv import ParameterGrid, cross_validation, build_k_indices, build_folds
-from helpers import write_json, read_json, read_training_set
+from data_io import read_json, write_json, read_training_set
 
 
 def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
