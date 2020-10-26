@@ -11,7 +11,7 @@ def read_weights(model):
     """
     Reads the weights for a corresponding model.
     """
-    WEIGHTS_DIR = "hyperparams"
+    WEIGHTS_DIR = "hyperparams_weights"
     WEIGHTS_FILENAME = f"weights_{model}.json"
     w = read_json(path.join(WEIGHTS_DIR, WEIGHTS_FILENAME))['weights']
     return w

@@ -7,8 +7,6 @@ import numpy as np
 import json
 import csv
 
-from costs import sigmoid
-
 models = ["gd", "sgd", "ridge", "least_squares", "logistic", "regularized_logistic"]
 model_to_string = {
     "gd": "GD", "sgd": "SGD", "ridge": "RIDGE", "least_squares": "LS", "logistic": "LR", "regularized_logistic": "LRL"
@@ -109,35 +107,6 @@ def build_poly(x, degree):
         return poly, ind
 
 
-def load_data(sub_sample=True, add_outlier=False):
-    """
-    Loads data and converts it to the metrics system.
-    """
-    path_dataset = "./Data/height_weight_genders.csv"
-    data = np.genfromtxt(
-        path_dataset, delimiter=",", skip_header=1, usecols=[1, 2])
-    height = data[:, 0]
-    weight = data[:, 1]
-    gender = np.genfromtxt(
-        path_dataset, delimiter=",", skip_header=1, usecols=[0],
-        converters={0: lambda x: 0 if b"Male" in x else 1})
-    # Convert to metric system
-    height *= 0.025
-    weight *= 0.454
-
-    # sub-sample
-    if sub_sample:
-        height = height[::50]
-        weight = weight[::50]
-
-    if add_outlier:
-        # outlier experiment
-        height = np.concatenate([height, [1.1, 1.2]])
-        weight = np.concatenate([weight, [51.5 / 0.454, 55.3 / 0.454]])
-
-    return height, weight, gender
-
-
 def standardize(x):
     """Standardizes the original data set."""
     mean_x = np.mean(x)
@@ -145,6 +114,12 @@ def standardize(x):
     std_x = np.std(x)
     x = x / std_x
     return x, mean_x, std_x
+
+
+def sigmoid(t):
+    """Applies the sigmoid function on t."""
+    sigmoid = 1 / (1 + np.exp(-t))
+    return sigmoid
 
 
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
@@ -171,29 +146,6 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         end_index = min((batch_num + 1) * batch_size, data_size)
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
-
-
-def read_json(filename):
-    """
-    Reads the given file (.json) and returns the object.
-    filename: name of the file (with .json extension)
-    """
-    if ".json" not in filename:
-        raise NameError("Filename needs to include .json extension!")
-    with open(filename, "r") as f:
-        return json.load(f)
-
-
-def write_json(filename, object):
-    """
-    Writes a given object to a json file.
-    filename: name of the file (with .json extension)
-    object: object to write
-    """
-    if ".json" not in filename:
-        raise NameError("Filename needs to include .json extension!")
-    with open(filename, "w") as f:
-        json.dump(object, f)
 
 
 def load_csv_data(data_path, skip_header=1, sub_sample=False):
@@ -241,6 +193,29 @@ def create_csv_submission(ids, y_pred, name):
             writer.writerow({'Id': int(r1), 'Prediction': int(r2)})
 
 
+def read_json(filename):
+    """
+    Reads the given file (.json) and returns the object.
+    filename: name of the file (with .json extension)
+    """
+    if ".json" not in filename:
+        raise NameError("Filename needs to include .json extension!")
+    with open(filename, "r") as f:
+        return json.load(f)
+
+
+def write_json(filename, object):
+    """
+    Writes a given object to a json file.
+    filename: name of the file (with .json extension)
+    object: object to write
+    """
+    if ".json" not in filename:
+        raise NameError("Filename needs to include .json extension!")
+    with open(filename, "w") as f:
+        json.dump(object, f)
+
+
 def read_training_set():
     """
     Reads training data.
@@ -281,7 +256,7 @@ def read_best_hyperparameters(model):
     hyperparameters : dict containing the best performing set of hyperparameters
     """
 
-    HYPERPARAMS_FOLDER = 'hyperparams/'
+    HYPERPARAMS_FOLDER = 'hyperparams_weights/'
     HYPERPARAMS_BEST_VALUES = f'best_hyperparams_{model}.json'
 
     filename = path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_BEST_VALUES)

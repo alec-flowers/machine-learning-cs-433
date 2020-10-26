@@ -2,7 +2,7 @@
 """Functions used to compute the loss."""
 import numpy as np
 
-from helpers import predict_labels
+from helpers import predict_labels, sigmoid
 
 
 def compute_error(y, tx, w):
@@ -96,16 +96,9 @@ def calc_accuracy(y_actual, tx, w, model):
     return accuracy
 
 
-def sigmoid(t):
-    """Applies the sigmoid function on t."""
-    sigmoid = 1 / (1 + np.exp(-t))
-    return sigmoid
-
-
 def calculate_logistic_loss(y, tx, w):
     """Computes the loss: negative log likelihood."""
     pred = sigmoid(tx @ w)
     loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))
     N = len(y)
     return np.squeeze(-loss) / N
-

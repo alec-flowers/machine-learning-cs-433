@@ -37,7 +37,7 @@ def train(model):
     print("Loss training: " + str(loss_tr))
     hyperparameters['weights'] = weight.tolist()
 
-    WEIGHTS_DIR = "hyperparams"
+    WEIGHTS_DIR = "hyperparams_weights"
     WEIGHTS_FILENAME = f"weights_{model}.json"
     print(f"Saving weights and corresponding hyperparameters to {path.join(WEIGHTS_DIR, WEIGHTS_FILENAME)}")
     write_json(path.join(WEIGHTS_DIR, WEIGHTS_FILENAME), hyperparameters)

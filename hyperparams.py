@@ -107,7 +107,7 @@ def read_init_hyperparam(model):
     """
     Reads the input collection of hyperparameters for a given model and loads the training dataset.
     """
-    HYPERPARAMS_FOLDER = 'hyperparams/'
+    HYPERPARAMS_FOLDER = 'hyperparams_weights/'
     HYPERPARAMS_INIT_VALUES = 'init_hyperparams.json'
 
     return read_json(path.join(HYPERPARAMS_FOLDER, HYPERPARAMS_INIT_VALUES))[model]
@@ -117,7 +117,7 @@ def save_hyperparams(model, hp_star):
     """
     Saves the best performing set of hyperparameters (hp_star) of a given model into a .json file
     """
-    filename = f"hyperparams/best_hyperparams_{model}.json"
+    filename = f"hyperparams_weights/best_hyperparams_{model}.json"
     write_json(filename, hp_star)
 
 
@@ -138,7 +138,7 @@ def find_hyperparams(model):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="CLI for the hyperparams.py which finds the best hyperparameters.")
+    parser = argparse.ArgumentParser(description="CLI for the hyperparams_weights.py which finds the best hyperparameters.")
     parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True,
                         choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
 
