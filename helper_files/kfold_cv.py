@@ -182,6 +182,7 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
         # calculate the loss for train and test data:
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
+    # logistic regression:
     elif model == 'logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
@@ -194,6 +195,7 @@ def cross_validation(train_x, train_y, test_x, test_y, hp, model):
                                                                num_batches, test_y, test_x)
         loss_te = compute_loss(test_y, test_x, weights, 'MSE')
 
+    # regularized logistic regression:
     elif model == 'regularized_logistic':
         initial_w = [0 for _ in range(train_x.shape[1])]
         max_iters = hp['max_iters']
