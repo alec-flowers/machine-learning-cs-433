@@ -5,7 +5,7 @@ import numpy as np
 import argparse
 
 from hyperparams import best_model_selection
-from helpers import models, model_to_string
+from helper_files.helpers import models, model_to_string
 from helper_files.data_io import read_training_set, read_best_hyperparameters
 
 

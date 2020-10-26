@@ -4,7 +4,7 @@ from os import path
 from timeit import default_timer as timer
 import numpy as np
 
-from helpers import sigmoid
+from helper_files.helpers import sigmoid
 
 
 def load_csv_data(data_path, skip_header=1, sub_sample=False):

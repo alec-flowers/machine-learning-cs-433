@@ -2,7 +2,7 @@
 """Functions used to compute the loss."""
 import numpy as np
 
-from helpers import sigmoid
+from helper_files.helpers import sigmoid
 from helper_files.data_io import predict_labels
 
 

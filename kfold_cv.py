@@ -4,8 +4,8 @@ import numpy as np
 from implementation import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
     logistic_regression, regularized_logistic_regression
 from helper_files.costs import compute_loss, calc_accuracy
-from helpers import build_poly
-from data_pre_process import impute, standardize
+from helper_files.helpers import build_poly
+from helper_files.data_pre_process import impute, standardize
 
 
 class ParameterGrid:
