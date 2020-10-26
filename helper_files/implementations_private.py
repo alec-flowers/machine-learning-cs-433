@@ -3,10 +3,6 @@ import numpy as np
 from helper_files.costs import compute_loss, compute_error, calculate_logistic_loss
 from helper_files.helpers import batch_iter, sigmoid
 
-# Machine Learning Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-"""Gradient Descent"""
-
 
 def compute_gradient(y, tx, w):
     """Compute a gradient for MSE.
@@ -34,7 +30,7 @@ def compute_gradient(y, tx, w):
     return gradient
 
 
-def least_squares_GD(y, tx, initial_w, max_iters, gamma):
+def gradient_descent(y, tx, initial_w, max_iters, gamma, test_y=None, test_x=None, error_type='MSE'):
     """Gradient Descent algorithm.
 
     Every epoch takes sums errors across all y - e and is therefore computationally more expensive than SGD.
@@ -50,38 +46,55 @@ def least_squares_GD(y, tx, initial_w, max_iters, gamma):
     initial_w : ndarray of shape (n_weights,)
         Weight vector
 
-    max_iters:
-        Maximum iterations to do
+    epsilon: float
+        do gradient descent until residual is smaller than epsilon
 
     gamma : float
         learing rate
 
     Returns
     ----------
-    w : np.array of shape(1, D)
-        Optimal weights calculated.
+    losses : list of shape (max_iters+1, )
+        MSE loss for corresponding weight values
+        Index relates to the epoch
 
-    loss : np.float64
-        MSE loss for corresponding weight value
+    ws : list of shape (max_iters+1, )
+        Weight values updated by gradient
+        Index relates to the epoch
+
     """
-    # initialize
-    error_type = 'MSE'
+
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
-    # do gradient descent
+    if isinstance(test_y, np.ndarray):
+        losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
+
     for iter in range(max_iters):
         gradient = compute_gradient(y, tx, ws[-1])
         w = ws[-1] - gamma * gradient
         loss = compute_loss(y, tx, w, error_type)
+        if isinstance(test_y, np.ndarray):
+            loss_test = compute_loss(test_y, test_x, w, error_type)
+
         ws.append(w)
         losses.append(loss)
+        if isinstance(test_y, np.ndarray):
+            losses_test.append(loss_test)
+
         if iter % int(max_iters / 5) == 0:
             print("GD({bi}/{ti}): loss={l:.6f}".format(bi=iter, ti=max_iters - 1, l=losses[-1]))
-    return ws[-1], losses[-1]
+
+    if isinstance(test_y, np.ndarray):
+        learning_curve = [[_ for _ in range(max_iters + 1)], losses_test, losses]
+    else:
+        learning_curve = None
+
+    return ws[-1], losses[-1], learning_curve
 
 
-def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
+def stochastic_gradient_descent(y, tx, initial_w, max_iters, batch_size, gamma, num_batches, test_y=None, test_x=None,
+                                error_type='MSE'):
     """Stochastic Gradient Descent algorithm.
 
     batch_size selected at 1 this is classic SGD. batch_size > 1 this is now Minibatch
@@ -98,41 +111,61 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
     initial_w : ndarray of shape (n_weights,)
         Weight vector
 
-    max_iters:
-        Maximum iterations to do
+    batch_size : int
+        size of  the batches
+
+    epsilon: float
+        do gradient descent until residual is smaller than epsilon
 
     gamma : float
         learing rate
 
+    num_batches: int
+        Number of mini batches for one iteration
 
     Returns
     ----------
-    w : np.array of shape(1, D)
-        Optimal weights calculated.
+    losses : list of shape (max_iters+1, )
+        MSE loss for corresponding weight values
+        Index relates to the epoch
 
-    loss : np.float64
-        MSE loss for corresponding weight value
+    ws : list of shape (max_iters+1, )
+        Weight values updated by gradient
+        Index relates to the epoch
+
     """
-    # init
-    error_type = 'MSE'
-    batch_size = 1
-    num_batches = 1
+
     W0 = 0
     ws = [initial_w]
     losses = [compute_loss(y, tx, ws[W0], error_type)]
-    # do stochastic gradient descent
+    if isinstance(test_y, np.ndarray):
+        losses_test = [compute_loss(test_y, test_x, ws[W0], error_type)]
+
     for iter in range(max_iters):
         for batch_y, batch_tx in batch_iter(y, tx, batch_size, num_batches=num_batches):
             gradient = compute_gradient(batch_y, batch_tx, ws[-1])
             w = ws[-1] - gamma * gradient
             loss = compute_loss(y, tx, w, error_type)
+
+            if isinstance(test_y, np.ndarray):
+                loss_test = compute_loss(test_y, test_x, w, error_type)
+
             ws.append(w)
             losses.append(loss)
+            if isinstance(test_y, np.ndarray):
+                losses_test.append(loss_test)
+
         if iter % int(max_iters / 5) == 0:
             print(
                 "SGD({bi}/{ti}): loss={l:.6f}, w0={w0:.3f}, w1={w1:.3f}".format(bi=iter, ti=max_iters - 1, l=losses[-1],
                                                                                 w0=w[0], w1=w[1]))
-    return ws[-1], losses[-1]
+
+        if isinstance(test_y, np.ndarray):
+            learning_curve = [[_ for _ in range(max_iters + 1)], losses_test, losses]
+        else:
+            learning_curve = None
+
+    return ws[-1], losses[-1], learning_curve
 
 
 def least_squares(y, tx):
@@ -153,6 +186,7 @@ def least_squares(y, tx):
 
     loss : np.float64
         MSE loss for corresponding weight value
+
     """
     w = np.linalg.solve(tx.T.dot(tx), tx.T.dot(y))
     loss = compute_loss(y, tx, w, 'MSE')
@@ -176,7 +210,7 @@ def ridge_regression(y, tx, lambda_):
     Returns
     ----------
     w : np.array of shape(1, D)
-        Optimal weights calculated using normulaequations.
+        Optimal weights calculated using normula equations.
 
     loss : np.float64
         MSE loss for corresponding weight value
@@ -217,84 +251,48 @@ def calculate_gradient_logistic(y, tx, w):
     return gradient
 
 
-def logistic_regression(y, tx, initial_w, max_iters, gamma):
-    """
-    Logistic Gradient Descent algorithm.
-
-    Parameters
-    ----------
-    y : ndarray of shape (n_samples,)
-        Array of labels
-
-    tx : ndarray of shape (n_samples, n_features)
-        Training data
-
-    initial_w : ndarray of shape (n_weights,)
-        Weight vector
-
-    max_iters:
-        Maximum iterations to do
-
-    gamma : float
-        learing rate
-
-    Returns
-    ----------
-    w : np.array of shape(1, D)
-        Optimal weights calculated.
-
-    loss : np.float64
-        MSE loss for corresponding weight value
-
-    """
+def logistic_regression(y, tx, initial_w, max_iters, gamma, batch_size=1, num_batches=1,
+                        test_y=None, test_x=None):
+    # Logistic regression (using Gradient Descent):
     losses = []
     ws = [initial_w]
-    # using gradient descent
+    if isinstance(test_y, np.ndarray):
+        losses_test = []
+
     for iter in range(max_iters):
+        # Learning by gradient descent
         w = ws[-1]
         gradient = calculate_gradient_logistic(y, tx, w)
         w = w - (gamma) * gradient
         loss = calculate_logistic_loss(y, tx, w)
+        if isinstance(test_y, np.ndarray):
+            loss_test = calculate_logistic_loss(test_y, test_x, w)
+
         losses.append(loss)
         ws.append(w)
+        if isinstance(test_y, np.ndarray):
+            losses_test.append(loss_test)
+
         if iter % int(max_iters / 5) == 0:
             print(f"Current iteration={iter}, loss={loss}")
+
+    if isinstance(test_y, np.ndarray):
+        learning_curve = [[_ for _ in range(max_iters)], losses_test, losses]
+    else:
+        learning_curve = None
+
     print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
-    return ws[-1], losses[-1]
+    return ws[-1], losses[-1], learning_curve
 
 
-def regularized_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
-    """
-    Logistic Gradient Descent algorithm.
-
-    Parameters
-    ----------
-    y : ndarray of shape (n_samples,)
-        Array of labels
-
-    tx : ndarray of shape (n_samples, n_features)
-        Training data
-
-    initial_w : ndarray of shape (n_weights,)
-        Weight vector
-
-    max_iters:
-        Maximum iterations to do
-
-    gamma : float
-        learing rate
-
-    Returns
-    ----------
-    w : np.array of shape(1, D)
-        Optimal weights calculated.
-
-    loss : np.float64
-        MSE loss for corresponding weight value
-
-    """
+# Regularized logistic regression (using GD):
+def regularized_logistic_regression(y, tx, initial_w, max_iters, gamma, lambda_, batch_size=1,
+                                    num_batches=1, test_y=None, test_x=None):
     losses = []
     ws = [initial_w]
+    if isinstance(test_y, np.ndarray):
+        losses_test = []
+
     for iter in range(max_iters):
         # Learning by gradient descent
         w = ws[-1]
@@ -303,9 +301,21 @@ def regularized_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma)
         gradient = np.add(gradient, lamb)
         w = w - gamma * gradient
         loss = calculate_logistic_loss(y, tx, w) + lambda_ * np.squeeze(w.T @ w)
+        if isinstance(test_y, np.ndarray):
+            loss_test = calculate_logistic_loss(test_y, test_x, w) + lambda_ * np.squeeze(w.T @ w)
+
         losses.append(loss)
         ws.append(w)
+        if isinstance(test_y, np.ndarray):
+            losses_test.append(loss_test)
+
         if iter % int(max_iters / 5) == 0:
             print("Current iteration = {i}, loss = {l}".format(i=iter, l=loss))
-    print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
-    return ws[-1], losses[-1]
+
+        if isinstance(test_y, np.ndarray):
+            learning_curve = [[_ for _ in range(max_iters)], losses_test, losses]
+        else:
+            learning_curve = None
+
+    # print("loss={l}".format(l=calculate_logistic_loss(y, tx, w)))
+    return ws[-1], losses[-1], learning_curve
