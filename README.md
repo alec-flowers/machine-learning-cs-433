@@ -9,7 +9,7 @@ The Higgs boson is a particle which gives mass to other elementary particles. In
     * [b) hyperparameters.py](#hyperparameters.py)
     * [c) training.py](#training.py)
     * [d) plots.py](#plots.py)
-* [Example workflow](#Example workflow)
+* [Submission workflow](#Submission workflow)
 * [File structure](#File structure)
 
 
@@ -98,29 +98,29 @@ where `<name_of_plot>` is a choice between 'box' (boxplot comparing accuracy of 
 **Outcomes:** the generated learning curve is saved in `./img` as 'Learning_Curve_{model}_{hyperparameters}'. The generated boxplot is just shown.
 
 
-## Example workflow
-In this section we show an example of the workflow one would go through to iterate and improve machine learning predictions. 
-Linear regression using Gradient Descent is used for this example.
+## Submission workflow
+In this section we show the workflow we followed to create our best submission (92765).
+We used Regularized Logistic Regression with hyperparameters: max_iters = 3000, gamma = 1e-6, degree = 2 and lambda_ = 0
 1. Check that 'train.csv' and 'test.csv' are in `./Data`.
-2. Adjust hyperparameters in `./hyperparams_weights/init_hyperparams.json`
+2. Adjust hyperparameters in `./hyperparams_weights/init_hyperparams.json` (this is already done).
 3. Run hyperparameters.py
     ```
-    $ python3 hyperparams.py -m gradient_descent
+    $ python3 hyperparams.py -m regularized_logistic
     ```
-4. 'best_hyperparams_gradient_descent.json' will be saved at `./hyperparams_weights`
-5. Run plot.py 
+4. 'best_hyperparams_regularized_logistic.json' will be saved at `./hyperparams_weights`
+5. If you want to check the plot, run plot.py 
     ```
-    $ python3 plot.py -p gd
+    $ python3 plot.py -p regularized_logistic
     ```
-6. The generated plot will be saved in `./img` as 'Learning_Curve_{model}_{hyperparameters}'
+6. The generated plot will be saved in `./img` as 'Learning_Curve_regularized_logistic_{hyperparameters}.pdf'
 7. Run training.py
     ```
-    $ python3 training.py -m gradient_descent
+    $ python3 training.py -m regularized_logistic
     ```
-8. 'weights_least_squares.json' will be saved at `./hyperparams_weights`
-9. Run run.py stating the argument for gradient descent (the default uses regularized logistic regression).
+8. 'weights_regularized_logistic.json' will be saved at `./hyperparams_weights`
+9. Run run.py (the default uses regularized logistic regression).
     ```
-    $ python3 run.py -m gradient_descent
+    $ python3 run.py 
     ```
 10. Results will be saved to a file named 'submission.csv' at the project root directory.
 
