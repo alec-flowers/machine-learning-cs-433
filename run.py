@@ -76,7 +76,8 @@ def main(args):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="CLI for the run.py which generates the predictions.")
-    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', required=True)
+    parser.add_argument('-m', '--method', type=str, help='Which method to use to predict.', default='regularized_logistic',
+                        choices=['sgd', 'gd', 'ridge', 'least_squares', 'logistic', 'regularized_logistic'])
 
     return parser.parse_args()
 

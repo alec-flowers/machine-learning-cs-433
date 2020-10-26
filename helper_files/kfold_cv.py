@@ -1,7 +1,7 @@
 from timeit import default_timer as timer
 import numpy as np
 
-from implementations import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
+from helper_files.implementations_private import ridge_regression, gradient_descent, stochastic_gradient_descent, least_squares, \
     logistic_regression, regularized_logistic_regression
 from helper_files.costs import compute_loss, calc_accuracy
 from helper_files.helpers import build_poly
