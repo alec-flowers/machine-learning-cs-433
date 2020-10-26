@@ -131,8 +131,6 @@ Here is the file structure of the project:
 ```bash
 Project
 |
-|--README.md
-|-- submission.csv  
 |
 |-- Data
 |   |-- test.csv
@@ -160,7 +158,7 @@ Project
 |    |-- data_pre_process.py : functions used to pre-process data (standardization, normalization and imputation)
 |    |-- helpers.py : helper functions 
 |    |-- kfold_cv.py : used to generate the combinations of hyperparameters and perform k-fold cross validation for each model
-|   |-- implementations_private.py : contains the machine learning methods used to train the data (gradient descent, stochastic gradient descent, least squares, ridge regression, logistic regression and regularized logistic regression)
+|    |-- implementations_private.py : contains the machine learning methods used to train the data (gradient descent, stochastic gradient descent, least squares, ridge regression, logistic regression and regularized logistic regression)
 |
 |-- img : contains the images of the plots
 |
@@ -169,7 +167,9 @@ Project
 |-- hyperparams.py : used to find the best performing set of hyperparameters for a given model using K-Fold Cross Validation and save them
 |-- training.py : used to train the data, finds and saves the weights corresponding to the best performing set of hyperparameters
 |-- plots.py : generates plots showing the accuracy of each model and learning curves
-
+|-- README.md
+|-- submission.csv
+|-- project1_report.pdf
 ```
 
 
