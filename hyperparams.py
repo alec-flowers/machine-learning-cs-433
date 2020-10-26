@@ -93,7 +93,7 @@ def best_model_selection(model, hyperparameters, x, y, k_fold=4, seed=1):
                hp_star.items()}  # needs params as a list for the enumeration in ParameterGrid to work
     w = weights[min_acc_idx]
 
-    return hp_star, acc_star, w, accuracy, learning_curve_list
+    return hp_star, acc_star, w, acc_list, learning_curve_list
 
 
 def read_hyperparam_input(model):
