@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 import argparse
 from os import path
 
-from proj1_helpers import load_csv_data
+from helpers import load_csv_data
 
 from helpers import read_json, write_json
 from kfold_cv import cross_validation, build_folds
